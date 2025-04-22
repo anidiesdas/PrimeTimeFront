@@ -58,6 +58,19 @@ html, body {
   cursor: pointer;
   padding-left: 11rem;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.63);
+  text-decoration: none;
+}
+
+.nav-links a,
+.nav-links .router-link-active,
+.nav-links .router-link-exact-active {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: #1f1f1f;
+  text-shadow: 1px 1px 0 rgba(235, 240, 241, 0.63);
 }
 
 /* === Willkommen + Suche === */

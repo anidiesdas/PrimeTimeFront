@@ -1,56 +1,31 @@
 <template>
-  <div class="page-container">
-    <nav class="navbar">
-      <div class="nav-links">
-        <a>Trending</a>
-        <a>Plan To Watch</a>
-        <a>Dropped</a>
-        <a>Completed</a>
-        <a>Statistics</a>
-      </div>
-    </nav>
+  <div class="welcome-wrapper">
+    <router-link to="/">
+      <img src="@/assets/profile.png" alt="Profilbild" class="profile-pic" />
+    </router-link>    <div class="welcome-text">
+      <h1>Prime Time :))</h1>
+    </div>
+  </div>
 
-    <div class="main-section">
-      <!-- Linker Bereich -->
-      <div class="main-content">
-        <div class="welcome-wrapper">
-          <img src="@/assets/profile.png" alt="Profilbild" class="profile-pic" />
-          <div class="welcome-text">
-            <h1>Prime Time :))</h1>
-          </div>
-        </div>
-
-
-        <div class="movie-list">
-          <h2>🎬⭐Trending Movies</h2>
-          <div class="movie-grid">
-            <div v-for="movie in movies" :key="movie.id" class="movie-card">
-              <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
-              <div>
-                <h3>{{ movie.title }}</h3>
-                <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
-                <p><strong>Release Date: </strong> {{ movie.release_date }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-        <div class="sidebar">
-          <input
-              type="text"
-              class="search-input"
-              placeholder="Search..."
-              v-model="searchQuery"
-          />
-          <p2><strong>SDD Stats</strong></p2>
-          <p2>Plan To Watch: </p2>
-          <p2>Dropped:</p2>
-          <p2>Completed:</p2>
+  <div class="movie-list">
+    <h2>🎬⭐Trending Movies</h2>
+    <div class="movie-grid">
+      <div
+          v-for="movie in movies"
+          :key="movie.id"
+          class="movie-card"
+      >
+        <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
+        <div class="movie-details">
+          <h3>{{ movie.title }}</h3>
+          <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
+          <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
         </div>
       </div>
     </div>
+  </div>
 </template>
+
 
 
 <script setup>

@@ -3,7 +3,7 @@
     <!-- Navigation -->
     <nav class="navbar">
       <div class="nav-links">
-        <router-link to="/">Trending</router-link>
+        <router-link to="/popular">Trending</router-link>
         <a>Plan To Watch</a>
         <a>Dropped</a>
         <a>Completed</a>
@@ -14,7 +14,7 @@
     <!-- Hauptbereich: links Inhalt, rechts Sidebar -->
     <div class="main-section">
       <div class="main-content">
-        <router-view /> <!-- Deine eigentlichen Seiten -->
+        <router-view />
       </div>
 
       <!-- Sidebar (Suchleiste + Stats) -->
