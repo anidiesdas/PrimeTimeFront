@@ -30,20 +30,15 @@
 <!--  filter: drop-shadow(0 0 2em #42b883aa);-->
 <!--}-->
 <!--</style>-->
+
 <template>
-  <div class="app-container">
+  <div class="page-container">
     <router-view />
   </div>
 </template>
+
 
 <script setup>
 // kein script nötig
 </script>
 
-<style>
-.app-container {
-  padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-</style>

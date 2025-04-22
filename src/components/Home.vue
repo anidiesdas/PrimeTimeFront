@@ -16,12 +16,13 @@
         <div class="welcome-wrapper">
           <img src="@/assets/profile.png" alt="Profilbild" class="profile-pic" />
           <div class="welcome-text">
-            <h1>🎬⭐Trending Movies</h1>
+            <h1>Prime Time :))</h1>
           </div>
         </div>
 
 
         <div class="movie-list">
+          <h2>🎬⭐Trending Movies</h2>
           <div class="movie-grid">
             <div v-for="movie in movies" :key="movie.id" class="movie-card">
               <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
@@ -35,16 +36,20 @@
         </div>
       </div>
 
-      <div class="sidebar">
-        <input
-            type="text"
-            class="search-input"
-            placeholder="Search..."
-            v-model="searchQuery"
-        />
+        <div class="sidebar">
+          <input
+              type="text"
+              class="search-input"
+              placeholder="Search..."
+              v-model="searchQuery"
+          />
+          <p2><strong>SDD Stats</strong></p2>
+          <p2>Plan To Watch: </p2>
+          <p2>Dropped:</p2>
+          <p2>Completed:</p2>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 

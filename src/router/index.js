@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MovieList from '../components/MovieList.vue'
 import MovieSearch from '../components/MovieSearch.vue'
-import HelloWorld from '../components/HelloWorld.vue'
+import Home from "@/components/Home.vue";
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: HelloWorld
+        component: Home
     },
     {
         path: '/popular',
