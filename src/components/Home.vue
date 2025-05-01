@@ -10,18 +10,21 @@
   <div class="movie-list">
     <h2>🎬⭐Trending Movies</h2>
     <div class="movie-grid">
-      <div
+      <router-link
           v-for="movie in movies"
           :key="movie.id"
-          class="movie-card"
+          :to="`/movie/${movie.id}`"
+          class="movie-card-link"
       >
-        <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
-        <div class="movie-details">
-          <h3>{{ movie.title }}</h3>
-          <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
-          <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+        <div class="movie-card">
+          <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
+          <div class="movie-details">
+            <h3>{{ movie.title }}</h3>
+            <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -53,7 +56,7 @@ onMounted(async () => {
     const data = await res.json()
     movies.value = data.results
   } catch (err) {
-    console.error('Fehler beim Laden der Filme:', err)
+    console.error('Error:', err)
   }
 })
 </script>

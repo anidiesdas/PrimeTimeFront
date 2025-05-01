@@ -13,23 +13,22 @@
     <div v-else-if="movies.length === 0">No results found.</div>
 
     <div v-else class="movie-grid">
-      <div
+      <router-link
           v-for="movie in movies"
           :key="movie.id"
-          class="movie-card"
+          :to="`/movie/${movie.id}`"
+          class="movie-card-link"
       >
-        <img
-            :src="getPosterUrl(movie.poster_path)"
-            alt="Poster"
-            class="poster"
-        />
-        <div class="movie-details">
-          <h3>{{ movie.title }}</h3>
-          <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
-          <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
-          <p><strong>Runtime:</strong> {{ movie.runtime ?? '–' }} min</p>
+        <div class="movie-card">
+          <img
+              :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster"/>
+          <div class="movie-details">
+            <h3>{{ movie.title }}</h3>
+            <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
+            <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -52,7 +51,7 @@ const fetchMovies = async () => {
     const data = await res.json()
     movies.value = data.results || []
   } catch (err) {
-    console.error('Fehler beim Abrufen der Filme:', err)
+    console.error('Error...:', err)
   } finally {
     isLoading.value = false
   }

@@ -73,7 +73,7 @@ html, body {
   text-shadow: 1px 1px 0 rgba(235, 240, 241, 0.63);
 }
 
-/* === Willkommen + Suche === */
+/* === Willkommen === */
 .content-wrapper {
   width: 100%;
 }
@@ -146,6 +146,7 @@ html, body {
   min-height: 160px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 .poster {
@@ -183,7 +184,14 @@ p {
   font-family: 'Rubik';
 }
 
-/* === Sidebar === */
+.movie-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+
+/* === Sidebar + Suche === */
 .sidebar {
   flex: 0.5;
   border-left: 1px solid rgba(255, 255, 255, 0.51);
