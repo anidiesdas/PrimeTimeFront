@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <!-- Navigation -->
     <nav class="navbar">
       <div class="nav-links">
         <router-link to="/popular">Trending</router-link>
@@ -11,13 +10,11 @@
       </div>
     </nav>
 
-    <!-- Hauptbereich: links Inhalt, rechts Sidebar -->
     <div class="main-section">
       <div class="main-content">
         <router-view />
       </div>
 
-      <!-- Sidebar (Suchleiste + Stats) -->
       <div class="sidebar">
         <input
             v-model="searchQuery"

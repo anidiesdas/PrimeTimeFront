@@ -21,6 +21,7 @@
       <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
+      <Rating :movie-id="movie.id" />
     </div>
   </div>
 </template>
@@ -28,6 +29,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import Rating from './Rating.vue'
 
 const route = useRoute()
 const movie = ref({})
@@ -84,10 +86,11 @@ const posterUrl = computed(() =>
   padding: 0.4rem 0.8rem;
   border: 1px solid #999;
   border-radius: 999px;
-  background-color: rgba(163, 205, 244, 0.45);
+  background-color: #A3CDF472;
   color: #fff;
   font-size: 0.9rem;
   white-space: nowrap;
+  font-family: "Special Gothic Expanded One";
 }
 
 </style>
