@@ -18,7 +18,7 @@
           :key="genre.id"> {{ genre.name }}
       </span>
       </div>
-      <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+      <p><strong>Release Date:</strong> {{ movie.formattedReleaseDate}}</p>
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
       <Rating :movie-id="movie.id" />
@@ -39,10 +39,12 @@ onMounted(async () => {
   movie.value = await response.json()
 })
 
+// genre mapping
 const genreList = computed(() =>
     movie.value.genres?.map(g => g.name).join(', ') || ''
 )
 
+// produktionsländer
 const productionCountries = computed(() =>
     movie.value.production_countries?.map(c => c.name).join(', ') || ''
 )
@@ -52,7 +54,40 @@ const posterUrl = computed(() =>
         ? `https://image.tmdb.org/t/p/w500${movie.value.poster_path}`
         : ''
 )
+
+const formattedReleaseDate = computed(() => {
+  const dateString = movie.value.release_date || movie.value.releaseDate
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('de-DE')
+})
+
+const selectedDate = ref('')
+const selectedStatus = ref('')
+const selectedPlatform = ref('')
+const tags = ref([])
+const selectedUsers = ref([])
+const userReviews = ref({})
+
+const payload = computed(() => ({
+  movie: {
+    id: movie.value.id,
+    title: movie.value.title,
+    genre: movie.value.genre,
+    runningTime: movie.value.runningTime,
+    releaseDate: movie.value.release_date,
+    watchDate: selectedDate.value
+  },
+  status: selectedStatus.value,
+  platform: selectedPlatform.value,
+  tags: tags.value,
+  users: selectedUsers.value.map(user => ({
+    id: user.id,
+    name: user.name,
+    rating: userReviews.value[user.id]
+  }))
+}))
 </script>
+
 
 <style scoped>
 .movie-layout {

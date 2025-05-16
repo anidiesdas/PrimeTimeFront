@@ -20,7 +20,7 @@
           <img :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster" />
           <div class="movie-details">
             <h3>{{ movie.title }}</h3>
-            <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
+            <p><strong>Genres:</strong> {{ getGenreNames(movie.genre_ids) }}</p>
             <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
           </div>
         </div>
@@ -33,21 +33,16 @@
 
 <script setup>
 import {ref, onMounted} from 'vue'
-import { useRouter } from 'vue-router'
+import { genreMap } from '@/genre'
 
-const searchQuery = ref('')
-const router = useRouter()
-
-function search() {
-  if (searchQuery.value.trim()) {
-    router.push(`/search/${encodeURIComponent(searchQuery.value.trim())}`)
-  }
+const getGenreNames = (ids) => {
+  return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
 }
 
 const movies = ref([])
 
 function getPosterUrl(path) {
-  return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/100x150?text=No+Image'
+  return path ? `https://image.tmdb.org/t/p/w500${path}` : ''
 }
 
 onMounted(async () => {

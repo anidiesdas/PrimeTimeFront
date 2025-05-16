@@ -58,6 +58,16 @@
           class="tag-input"
       />
 
+      <select v-model="selectedPlatform" class="platform-dropdown">
+        <option disabled value="">Plattform wählen</option>
+        <option
+            v-for="platform in platforms"
+            :key="platform.value"
+            :value="platform.value" >
+          {{ platform.label }}
+        </option>
+      </select>
+
       <div class="tag-list">
       <span
           v-for="(tag, index) in tags"
@@ -85,7 +95,21 @@ export default {
       userReviews: {},
       newTag: '',
       tags: [],
-    notification: { message: '', type: '' }
+      selectedPlatform: '',
+      platforms: [
+        { value: 'NETFLIX', label: 'Netflix' },
+        { value: 'PRIME_VIDEO', label: 'Prime Video' },        { value: 'DISNEY_PLUS', label: 'Disney+' },
+        { value: 'DISNEY_PLUS', label: 'Disney+' },
+        { value: 'BLURAY_DVD', label: 'Blu-ray/DVD' },
+        { value: 'YOUTUBE', label: 'YouTube' },
+        { value: 'PARAMOUNT_PLUS', label: 'Paramount+' },
+        { value: 'ARTE_MEDIATHEK', label: 'Arte Mediathek' },
+        { value: 'UCI_KINO', label: 'UCI' },
+        { value: 'CINESTAR', label: 'Cinestar' },
+        { value: 'RTL_PLUS', label: 'RTL+' },
+        { value: 'OTHER', label: 'Other' },
+      ],
+      notification: { message: '', type: '' }
     }
   },
   mounted() {
@@ -127,25 +151,42 @@ export default {
     removeTag(index) {
       this.tags.splice(index, 1);
     },
+    isValid() {
+      // status muss ausgewählt sein
+      if (!this.selectedStatus) {
+        return false;
+      }
+
+      // dropped/completed: datum & plattform erforderlich
+      if (['dropped', 'completed'].includes(this.selectedStatus)) {
+        if (!this.selectedDate || !this.selectedPlatform) {
+          return false;
+        }
+      }
+
+      // completed: bewertung für alle
+      if (this.selectedStatus === 'completed') {
+        const hasMissingRatings = this.selectedUsers.some(user => {
+          const rating = this.userReviews[user.id];
+          return rating === undefined || rating === '';
+        });
+
+        if (hasMissingRatings) {
+          return false;
+        }
+      }
+
+      return true;
+    },
     saveData() {
-      this.notification.message = '';
-      this.notification.type = '';
-
-      const hasMissingRatings = this.selectedStatus === 'completed' &&
-          this.selectedUsers.some(user => {
-            const rating = this.userReviews[user.id];
-            return rating === undefined || rating === '';
-          });
-
-      if (hasMissingRatings) {
-        this.notification.message = 'Rating missing:(';
+      if (!this.isValid()) {
+        this.notification.message = 'sumtin missin grrr';
         this.notification.type = 'error';
         return;
       }
 
       this.notification.message = 'Movie saved:))';
       this.notification.type = 'success';
-
     }
 
   },
@@ -168,7 +209,7 @@ export default {
 .form-box {
   border: 1px solid rgba(204, 204, 204, 0.23);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.3rem 1.3rem 1rem 1.3rem;
   background-color: rgba(255, 255, 255, 0.13);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   position: relative;
@@ -283,14 +324,21 @@ export default {
   gap: 6px;
   font-family: "Special Gothic Expanded One";
 }
-
 .remove-tag {
   background: none;
   border: none;
   font-size: 0.9rem;
-  color: #555;
+  color: #ffffff;
   cursor: pointer;
   margin-left: 4px;
+}
+.platform-dropdown {
+  width: 150px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-left: 1rem;
 }
 .save-button {
   background-color: #d884cb;

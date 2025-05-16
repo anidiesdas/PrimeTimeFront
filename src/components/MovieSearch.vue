@@ -24,7 +24,7 @@
               :src="getPosterUrl(movie.poster_path)" alt="Poster" class="poster"/>
           <div class="movie-details">
             <h3>{{ movie.title }}</h3>
-            <p><strong>Genre:</strong><br>{{ movie.genre_ids?.join(', ') }}</p>
+            <p><strong>Genres:</strong> {{ getGenreNames(movie.genre_ids) }}</p>
             <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
           </div>
         </div>
@@ -36,6 +36,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { genreMap } from '@/genre'
 
 const route = useRoute()
 const query = ref(route.params.query)
@@ -55,6 +56,10 @@ const fetchMovies = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const getGenreNames = (ids) => {
+  return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
 }
 
 onMounted(() => {
