@@ -18,10 +18,16 @@
           :key="genre.id"> {{ genre.name }}
       </span>
       </div>
-      <p><strong>Release Date:</strong> {{ movie.formattedReleaseDate}}</p>
+      <p><strong>Release Date:</strong> {{ movie.releaseDate}}</p>
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
-      <Rating :movie-id="movie.id" />
+      <Rating
+          :movie-id="movie.id"
+          :movie-title="movie.title"
+          :movie-runtime="movie.runningTime"
+          :movie-release-date="movie.releaseDate"
+          :movie-genres="movie.genres"
+      />
     </div>
   </div>
 </template>
@@ -36,7 +42,10 @@ const movie = ref({})
 
 onMounted(async () => {
   const response = await fetch(`http://localhost:8080/movie/${route.params.id}`)
-  movie.value = await response.json()
+  const data = await response.json();
+  data.releaseDate = data.release_date;
+  data.runningTime = data.runtime;
+  movie.value = data;
 })
 
 // genre mapping
@@ -55,12 +64,6 @@ const posterUrl = computed(() =>
         : ''
 )
 
-const formattedReleaseDate = computed(() => {
-  const dateString = movie.value.release_date || movie.value.releaseDate
-  if (!dateString) return '-'
-  return new Date(dateString).toLocaleDateString('de-DE')
-})
-
 const selectedDate = ref('')
 const selectedStatus = ref('')
 const selectedPlatform = ref('')
@@ -74,17 +77,9 @@ const payload = computed(() => ({
     title: movie.value.title,
     genre: movie.value.genre,
     runningTime: movie.value.runningTime,
-    releaseDate: movie.value.release_date,
+    releaseDate: movie.value.releaseDate,
     watchDate: selectedDate.value
   },
-  status: selectedStatus.value,
-  platform: selectedPlatform.value,
-  tags: tags.value,
-  users: selectedUsers.value.map(user => ({
-    id: user.id,
-    name: user.name,
-    rating: userReviews.value[user.id]
-  }))
 }))
 </script>
 

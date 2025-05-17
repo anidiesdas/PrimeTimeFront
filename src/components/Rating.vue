@@ -4,10 +4,9 @@
       <div class="status-controls">
         <select v-model="selectedStatus">
           <option disabled value="">Watchlist Status</option>
-          <option value="plan">Plan To Watch</option>
-          <option value="remove">Remove</option>
-          <option value="dropped">Dropped</option>
-          <option value="completed">Completed</option>
+          <option value="PLAN_TO_WATCH">Plan To Watch</option>
+          <option value="DROPPED">Dropped</option>
+          <option value="COMPLETED">Completed</option>
         </select>
 
         <input type="date" v-model="selectedDate" class="date-picker" />
@@ -21,7 +20,7 @@
     </div>
 
     <div
-        v-if="['dropped', 'completed'].includes(selectedStatus)"
+        v-if="['DROPPED', 'COMPLETED'].includes(selectedStatus)"
         class="user-select-container"
     >
       <button class="add-button" @click="toggleDropdown">👶</button>
@@ -39,12 +38,11 @@
         <span class="user-name">{{ user.name }}</span>
 
         <input
-            v-if="selectedStatus === 'completed'"
+            v-if="selectedStatus === 'COMPLETED'"
             type="text"
-            v-model="userReviews[user.id]"
+            v-model="ratingsByUser[user.id]"
             class="rating-input"
             placeholder="0–10"
-            @input="sanitizeInput(user.id)"
         />
       </div>
     </div>
@@ -84,33 +82,42 @@
 
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       selectedStatus: '',
       selectedDate: '',
       showDropdown: false,
-      allUsers: [], // wird jetzt dynamisch geladen
+      allUsers: [],
       selectedUsers: [],
-      userReviews: {},
+      ratingsByUser: {},
       newTag: '',
       tags: [],
       selectedPlatform: '',
       platforms: [
-        { value: 'NETFLIX', label: 'Netflix' },
-        { value: 'PRIME_VIDEO', label: 'Prime Video' },        { value: 'DISNEY_PLUS', label: 'Disney+' },
-        { value: 'DISNEY_PLUS', label: 'Disney+' },
-        { value: 'BLURAY_DVD', label: 'Blu-ray/DVD' },
-        { value: 'YOUTUBE', label: 'YouTube' },
-        { value: 'PARAMOUNT_PLUS', label: 'Paramount+' },
-        { value: 'ARTE_MEDIATHEK', label: 'Arte Mediathek' },
-        { value: 'UCI_KINO', label: 'UCI' },
-        { value: 'CINESTAR', label: 'Cinestar' },
-        { value: 'RTL_PLUS', label: 'RTL+' },
-        { value: 'OTHER', label: 'Other' },
+        {value: 'NETFLIX', label: 'Netflix'},
+        {value: 'PRIME_VIDEO', label: 'Prime Video'}, {value: 'DISNEY_PLUS', label: 'Disney+'},
+        {value: 'DISNEY_PLUS', label: 'Disney+'},
+        {value: 'BLURAY_DVD', label: 'Blu-ray/DVD'},
+        {value: 'YOUTUBE', label: 'YouTube'},
+        {value: 'PARAMOUNT_PLUS', label: 'Paramount+'},
+        {value: 'ARTE_MEDIATHEK', label: 'Arte Mediathek'},
+        {value: 'UCI_KINO', label: 'UCI'},
+        {value: 'CINESTAR', label: 'Cinestar'},
+        {value: 'RTL_PLUS', label: 'RTL+'},
+        {value: 'OTHER', label: 'Other'},
       ],
-      notification: { message: '', type: '' }
+      notification: {message: '', type: ''}
     }
+  },
+  props: {
+    movieId: Number,
+    movieTitle: String,
+    movieRuntime: Number,
+    movieReleaseDate: String,
+    movieGenres: Array
   },
   mounted() {
     this.fetchUsers();
@@ -129,17 +136,8 @@ export default {
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
-    sanitizeInput(userId) {
-      let val = this.userReviews[userId];
-      val = val.replace(/[^\d.]/g, '');
-      let num = parseFloat(val);
-      if (isNaN(num)) {
-        this.userReviews[userId] = '';
-      } else {
-        if (num > 10) num = 10;
-        if (num < 0) num = 0;
-        this.userReviews[userId] = num.toString();
-      }
+    getRatingFor(userId) {
+      return this.ratingsByUser[userId] || 0;
     },
     addTag() {
       const trimmed = this.newTag.trim();
@@ -154,24 +152,37 @@ export default {
     isValid() {
       // status muss ausgewählt sein
       if (!this.selectedStatus) {
+        this.notification.message = 'select a status';
+        this.notification.type = 'error';
         return false;
       }
 
       // dropped/completed: datum & plattform erforderlich
-      if (['dropped', 'completed'].includes(this.selectedStatus)) {
+      if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus)) {
         if (!this.selectedDate || !this.selectedPlatform) {
+          this.notification.message = 'select date and platform grrr';
+          this.notification.type = 'error';
           return false;
         }
       }
 
+      // dropped/completed: mind 1. member
+      if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus) && this.selectedUsers.length === 0) {
+        this.notification.message = "was there no one watching???";
+        this.notification.type = 'error';
+        return false;
+      }
+
       // completed: bewertung für alle
-      if (this.selectedStatus === 'completed') {
+      if (this.selectedStatus === 'COMPLETED') {
         const hasMissingRatings = this.selectedUsers.some(user => {
-          const rating = this.userReviews[user.id];
+          const rating = this.ratingsByUser[user.id];
           return rating === undefined || rating === '';
         });
 
         if (hasMissingRatings) {
+          this.notification.message = "a rating is missing:(";
+          this.notification.type = 'error';
           return false;
         }
       }
@@ -180,10 +191,41 @@ export default {
     },
     saveData() {
       if (!this.isValid()) {
-        this.notification.message = 'sumtin missin grrr';
-        this.notification.type = 'error';
         return;
       }
+
+      let ratings = [];
+
+      if (this.selectedStatus === 'COMPLETED') {
+        ratings = this.selectedUsers.map(user => ({
+          memberId: user.id,
+          rating: this.getRatingFor(user.id) || 0
+        }));
+      } else if (this.selectedStatus === 'DROPPED') {
+        ratings = this.selectedUsers.map(user => ({
+          memberId: user.id,
+          rating: null
+        }));
+      }
+
+      const payload = {
+        movie: {
+          id: this.movieId,
+          title: this.movieTitle,
+          runningTime: this.movieRuntime,
+          releaseDate: this.movieReleaseDate,
+          genres: this.movieGenres,
+          status: this.selectedStatus,
+          watchDate: this.selectedDate,
+          platform: this.selectedPlatform,
+          tags: this.tags
+        },
+        ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
+      };
+
+      axios.post('http://localhost:8080/saving', payload)
+          .then(() => alert("Gespeichert!"))
+          .catch(err => console.error("Fehler:", err));
 
       this.notification.message = 'Movie saved:))';
       this.notification.type = 'success';
@@ -192,13 +234,13 @@ export default {
   },
   watch: {
     selectedStatus(newStatus) {
-      if (newStatus === 'plan') {
+      if (newStatus === 'PLAN_TO_WATCH') {
         this.selectedUsers = [];
         this.showDropdown = false;
-        this.userReviews = {};
+        this.ratingsByUser = {};
       }
     }
-  }
+  },
 };
 </script>
 
