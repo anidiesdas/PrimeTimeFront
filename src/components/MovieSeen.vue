@@ -16,7 +16,10 @@
         {{ notification.message }}
       </div>
 
-      <button class="save-button" @click="saveData">Save</button>
+      <div class="saving">
+        <button class="update-button" @click="addRating">+</button>
+        <button class="save-button" @click="saveData">Save</button>
+      </div>
     </div>
 
     <div
@@ -235,6 +238,29 @@ export default {
       this.notification.message = 'Movie saved:))';
       this.notification.type = 'success';
     },
+    addRating() {
+      if (this.selectedUsers.length === 0) {
+        alert("Keine Person ausgewählt");
+        return;
+      }
+
+      const ratings = this.selectedUsers.map(user => ({
+        memberId: user.id,
+        rating: Number(this.getRatingFor(user.id)) || 0,
+        movieId: this.movieId
+      }));
+
+      axios.post("http://localhost:8080/movie/update", ratings)
+          .then(() => {
+            this.notification.message = 'Alle Ratings erfolgreich gespeichert :)';
+            this.notification.type = 'success';
+          })
+          .catch(err => {
+            console.error("Fehler beim Speichern der Ratings", err);
+            this.notification.message = 'Fehler beim Speichern der Ratings';
+            this.notification.type = 'error';
+          });
+    }
   },
   watch: {
     selectedStatus(newStatus) {
@@ -392,6 +418,19 @@ input[type="number"] {
   border-radius: 6px;
   font-size: 0.95rem;
   margin-left: 1rem;
+}
+.saving {
+}
+.update-button {
+  background-color: rgba(216, 132, 203, 0.38);
+  border: black;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  color: white;
+  cursor: pointer;
+  width: 2rem;
+  padding: 7px 10px;
+  margin-right: 0.5rem;
 }
 .save-button {
   background-color: #d884cb;

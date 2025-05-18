@@ -22,6 +22,7 @@
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
       <Rating
+          v-if="showRating"
           :movie-id="movie.id"
           :movie-title="movie.title"
           :movie-runtime="movie.runningTime"
@@ -39,19 +40,25 @@ import Rating from './Rating.vue'
 
 const route = useRoute()
 const movie = ref({})
+const showRating = ref(false);
+
 
 onMounted(async () => {
   const response = await fetch(`http://localhost:8080/movie/${route.params.id}`)
-  const data = await response.json();
-  data.releaseDate = data.release_date;
-  data.runningTime = data.runtime;
-  movie.value = data;
-})
+  const data = await response.json()
+  data.releaseDate = data.release_date
+  data.runningTime = data.runtime
+  movie.value = data
 
-// genre mapping
-const genreList = computed(() =>
-    movie.value.genres?.map(g => g.name).join(', ') || ''
-)
+  const backendResponse = await fetch(`http://localhost:8080/movie/status/${route.params.id}`)
+  if (backendResponse.status === 404) {
+    showRating.value = true
+  } else {
+    const rawText = await backendResponse.text()
+    const dbStatus = JSON.parse(rawText)
+    showRating.value = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
+  }
+})
 
 // produktionsländer
 const productionCountries = computed(() =>
@@ -63,24 +70,6 @@ const posterUrl = computed(() =>
         ? `https://image.tmdb.org/t/p/w500${movie.value.poster_path}`
         : ''
 )
-
-const selectedDate = ref('')
-const selectedStatus = ref('')
-const selectedPlatform = ref('')
-const tags = ref([])
-const selectedUsers = ref([])
-const userReviews = ref({})
-
-const payload = computed(() => ({
-  movie: {
-    id: movie.value.id,
-    title: movie.value.title,
-    genre: movie.value.genre,
-    runningTime: movie.value.runningTime,
-    releaseDate: movie.value.releaseDate,
-    watchDate: selectedDate.value
-  },
-}))
 </script>
 
 
