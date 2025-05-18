@@ -8,18 +8,13 @@
           <option value="DROPPED">Dropped</option>
           <option value="COMPLETED">Completed</option>
         </select>
-
-        <input type="date" v-model="selectedDate" class="date-picker" />
       </div>
 
       <div v-if="notification.message" :class="['notification-box', notification.type]">
         {{ notification.message }}
       </div>
 
-      <div class="saving">
-        <button class="update-button" @click="addRating">+</button>
-        <button class="save-button" @click="saveData">Save</button>
-      </div>
+      <button class="save-button" @click="updateData">Update</button>
     </div>
 
     <div
@@ -61,16 +56,6 @@
           class="tag-input"
       />
 
-      <select v-model="selectedPlatform" class="platform-dropdown">
-        <option disabled value="">Plattform wählen</option>
-        <option
-            v-for="platform in platforms"
-            :key="platform.value"
-            :value="platform.value" >
-          {{ platform.label }}
-        </option>
-      </select>
-
       <div class="tag-list">
       <span
           v-for="(tag, index) in tags"
@@ -93,36 +78,17 @@ export default {
   data() {
     return {
       selectedStatus: '',
-      selectedDate: '',
       showDropdown: false,
       allUsers: [],
       selectedUsers: [],
       ratingsByUser: {},
       newTag: '',
       tags: [],
-      selectedPlatform: '',
-      platforms: [
-        {value: 'NETFLIX', label: 'Netflix'},
-        {value: 'PRIME_VIDEO', label: 'Prime Video'}, {value: 'DISNEY_PLUS', label: 'Disney+'},
-        {value: 'DISNEY_PLUS', label: 'Disney+'},
-        {value: 'BLURAY_DVD', label: 'Blu-ray/DVD'},
-        {value: 'YOUTUBE', label: 'YouTube'},
-        {value: 'PARAMOUNT_PLUS', label: 'Paramount+'},
-        {value: 'ARTE_MEDIATHEK', label: 'Arte Mediathek'},
-        {value: 'UCI_KINO', label: 'UCI'},
-        {value: 'CINESTAR', label: 'Cinestar'},
-        {value: 'RTL_PLUS', label: 'RTL+'},
-        {value: 'OTHER', label: 'Other'},
-      ],
       notification: {message: '', type: ''}
     }
   },
   props: {
     movieId: Number,
-    movieTitle: String,
-    movieRuntime: Number,
-    movieReleaseDate: String,
-    movieGenres: Array
   },
   mounted() {
     this.fetchUsers();
@@ -154,111 +120,30 @@ export default {
     removeTag(index) {
       this.tags.splice(index, 1);
     },
-    isValid() {
-      // status muss ausgewählt sein
-      if (!this.selectedStatus) {
-        this.notification.message = 'select a status';
-        this.notification.type = 'error';
-        return false;
-      }
-
-      // dropped/completed: datum & plattform erforderlich
-      if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus)) {
-        if (!this.selectedDate || !this.selectedPlatform) {
-          this.notification.message = 'select date and platform grrr';
-          this.notification.type = 'error';
-          return false;
-        }
-      }
-
-      // dropped/completed: mind 1. member
-      if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus) && this.selectedUsers.length === 0) {
-        this.notification.message = "was there no one watching???";
-        this.notification.type = 'error';
-        return false;
-      }
-
-      // completed: bewertung für alle
-      if (this.selectedStatus === 'COMPLETED') {
-        const hasMissingRatings = this.selectedUsers.some(user => {
-          const rating = this.ratingsByUser[user.id];
-          return rating === undefined || rating === '';
-        });
-
-        if (hasMissingRatings) {
-          this.notification.message = "a rating is missing:(";
-          this.notification.type = 'error';
-          return false;
-        }
-      }
-
-      return true;
-    },
-    saveData() {
-      if (!this.isValid()) {
-        return;
-      }
-
-      let ratings = [];
-
-      if (this.selectedStatus === 'COMPLETED') {
-        ratings = this.selectedUsers.map(user => ({
-          memberId: user.id,
-          rating: Number(this.getRatingFor(user.id)) || 0
-        }));
-      } else if (this.selectedStatus === 'DROPPED') {
-        ratings = this.selectedUsers.map(user => ({
-          memberId: user.id,
-          rating: null
-        }));
-      }
-
-      const payload = {
-        movie: {
-          id: this.movieId,
-          title: this.movieTitle,
-          runningTime: this.movieRuntime,
-          releaseDate: this.movieReleaseDate,
-          genres: this.movieGenres.map(g => typeof g === 'string' ? g : g.name),
-          status: this.selectedStatus,
-          watchDate: this.selectedDate || null,
-          platform: this.selectedPlatform || null,
-          tags: this.tags
-        },
-        ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
-      };
-
-      axios.post('http://localhost:8080/movie/saving', payload)
-          .then(() => alert("Saved!"))
-          .catch(err => {
-            console.error("Fehler:", err.response?.data || err.message);
-            alert("Error: " + JSON.stringify(err.response?.data));
-          });
-
-      this.notification.message = 'Movie saved:))';
-      this.notification.type = 'success';
-    },
-    addRating() {
+    updateData() {
       if (this.selectedUsers.length === 0) {
-        alert("Keine Person ausgewählt");
+        this.notification.message = "Select a user grrr";
+        this.notification.type = "error";
         return;
       }
 
       const ratings = this.selectedUsers.map(user => ({
+        movieId: this.movieId,
         memberId: user.id,
-        rating: Number(this.getRatingFor(user.id)) || 0,
-        movieId: this.movieId
+        rating: this.selectedStatus === 'COMPLETED'
+            ? Number(this.getRatingFor(user.id)) || 0
+            : null
       }));
 
-      axios.post("http://localhost:8080/movie/update", ratings)
+      axios.post('http://localhost:8080/movie/update', ratings)
           .then(() => {
-            this.notification.message = 'Alle Ratings erfolgreich gespeichert :)';
+            this.notification.message = 'Movie updated:))';
             this.notification.type = 'success';
           })
           .catch(err => {
-            console.error("Fehler beim Speichern der Ratings", err);
-            this.notification.message = 'Fehler beim Speichern der Ratings';
-            this.notification.type = 'error';
+            console.error("Fehler:", err.response?.data || err.message);
+            this.notification.message = "Error";
+            this.notification.type = "error";
           });
     }
   },
@@ -273,8 +158,6 @@ export default {
   },
 };
 </script>
-
-
 
 
 <style scoped>
@@ -299,8 +182,7 @@ export default {
   display: flex;
   align-items: center;
 }
-.status-row select,
-.status-row .date-picker {
+.status-row select {
   width: 150px;
   padding: 6px 10px;
   border: 1px solid #ccc;
@@ -308,7 +190,6 @@ export default {
   font-size: 0.95rem;
   margin-right: 1rem;
 }
-
 .user-select-container {
   position: relative;
   display: inline-flex;
@@ -411,27 +292,6 @@ input[type="number"] {
   cursor: pointer;
   margin-left: 4px;
 }
-.platform-dropdown {
-  width: 150px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  margin-left: 1rem;
-}
-.saving {
-}
-.update-button {
-  background-color: rgba(216, 132, 203, 0.38);
-  border: black;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  color: white;
-  cursor: pointer;
-  width: 2rem;
-  padding: 7px 10px;
-  margin-right: 0.5rem;
-}
 .save-button {
   background-color: #d884cb;
   border: black;
@@ -454,5 +314,8 @@ input[type="number"] {
 }
 .notification-box.error {
   color: #ff5252;
+}
+.ratingdb {
+
 }
 </style>

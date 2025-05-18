@@ -8,7 +8,17 @@
   </div>
 
   <div class="movie-layout">
-    <img :src="posterUrl" alt="Movie Poster" class="movie-poster" />
+    <div class="left-column">
+      <img :src="posterUrl" class="poster" />
+
+      <div class="ratings-box">
+        <div v-for="r in ratings" :key="r.memberId" class="rating-pill">
+          {{ r.memberName }}: {{ r.rating }}
+        </div>
+      </div>
+    </div>
+
+
     <div class="movie-info">
       <p><strong>{{ movie.runtime }}min</strong></p>
       <div class="genre-tags">
@@ -29,47 +39,63 @@
           :movie-release-date="movie.releaseDate"
           :movie-genres="movie.genres"
       />
+      <MovieSeen
+          v-if="!showRating && movie.id"
+          :movie-id="movie.id"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import Rating from './Rating.vue'
+  import { ref, computed, onMounted } from 'vue'
+  import { useRoute } from 'vue-router'
+  import Rating from './Rating.vue'
+  import MovieSeen from './MovieSeen.vue'
 
-const route = useRoute()
-const movie = ref({})
-const showRating = ref(false);
+  const route = useRoute()
 
+  const movie = ref({})
+  const showRating = ref(false)
+  const ratings = ref([])
 
-onMounted(async () => {
+  const productionCountries = computed(() =>
+  movie.value.production_countries?.map(c => c.name).join(', ') || ''
+  )
+
+  const posterUrl = computed(() =>
+  movie.value.poster_path
+  ? `https://image.tmdb.org/t/p/w500${movie.value.poster_path}`
+  : ''
+  )
+
+  onMounted(async () => {
+  try {
   const response = await fetch(`http://localhost:8080/movie/${route.params.id}`)
   const data = await response.json()
   data.releaseDate = data.release_date
   data.runningTime = data.runtime
   movie.value = data
 
-  const backendResponse = await fetch(`http://localhost:8080/movie/status/${route.params.id}`)
-  if (backendResponse.status === 404) {
-    showRating.value = true
-  } else {
-    const rawText = await backendResponse.text()
-    const dbStatus = JSON.parse(rawText)
-    showRating.value = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
-  }
+  const statusResponse = await fetch(`http://localhost:8080/movie/status/${route.params.id}`)
+  if (statusResponse.status === 404) {
+  showRating.value = true
+} else {
+  const rawText = await statusResponse.text()
+  const dbStatus = JSON.parse(rawText)
+  showRating.value = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
+}
+
+  const ratingRes = await fetch(`http://localhost:8080/movie/ratings/${route.params.id}`)
+  if (ratingRes.ok) {
+  ratings.value = await ratingRes.json()
+} else {
+  console.warn("Keine Ratings gefunden")
+}
+} catch (err) {
+  console.error("Fehler beim Laden:", err)
+}
 })
-
-// produktionsländer
-const productionCountries = computed(() =>
-    movie.value.production_countries?.map(c => c.name).join(', ') || ''
-)
-
-const posterUrl = computed(() =>
-    movie.value.poster_path
-        ? `https://image.tmdb.org/t/p/w500${movie.value.poster_path}`
-        : ''
-)
 </script>
 
 
@@ -78,22 +104,40 @@ const posterUrl = computed(() =>
   display: flex;
   align-items: flex-start;
   gap: 2rem;
-  margin-top: 1.5rem;
-  margin-left: 1rem;
+  margin: 1.5rem 0 3rem 1rem;
 }
-
-.movie-poster {
+.left-column {
+  display: flex;
+  flex-direction: column;
+  margin: 0
+}
+.poster {
   width: 280px;
+  height: 100%;
   border-radius: 8px;
   object-fit: cover;
+  margin: 0;
 }
-
+.ratings-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.rating-pill {
+  background-color: #415a77;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-family: "Special Gothic Expanded One";
+  color: white;
+}
 .movie-info p {
   margin: 1rem 0;
   line-height: 1.5;
   font-size: 20px;
 }
-
 .genre-tags {
   display: flex;
   flex-wrap: wrap;
