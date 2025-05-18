@@ -39,10 +39,12 @@
 
         <input
             v-if="selectedStatus === 'COMPLETED'"
-            type="text"
-            v-model="ratingsByUser[user.id]"
+            type="number"
+            v-model.number="ratingsByUser[user.id]"
             class="rating-input"
             placeholder="0–10"
+            min="0"
+            max="10"
         />
       </div>
     </div>
@@ -199,7 +201,7 @@ export default {
       if (this.selectedStatus === 'COMPLETED') {
         ratings = this.selectedUsers.map(user => ({
           memberId: user.id,
-          rating: this.getRatingFor(user.id) || 0
+          rating: Number(this.getRatingFor(user.id)) || 0
         }));
       } else if (this.selectedStatus === 'DROPPED') {
         ratings = this.selectedUsers.map(user => ({
@@ -214,10 +216,10 @@ export default {
           title: this.movieTitle,
           runningTime: this.movieRuntime,
           releaseDate: this.movieReleaseDate,
-          genres: this.movieGenres,
+          genres: this.movieGenres.map(g => typeof g === 'string' ? g : g.name),
           status: this.selectedStatus,
-          watchDate: this.selectedDate,
-          platform: this.selectedPlatform,
+          watchDate: this.selectedDate || null,
+          platform: this.selectedPlatform || null,
           tags: this.tags
         },
         ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
@@ -225,7 +227,9 @@ export default {
 
       axios.post('http://localhost:8080/saving', payload)
           .then(() => alert("Gespeichert!"))
-          .catch(err => console.error("Fehler:", err));
+          .catch(err => {
+            console.error("Fehler:", err.response?.data || err.message);
+            alert("Fehler beim Speichern: " + JSON.stringify(err.response?.data));   });
 
       this.notification.message = 'Movie saved:))';
       this.notification.type = 'success';
@@ -337,7 +341,14 @@ export default {
   text-align: center;
   font-size: 0.9rem;
 }
-
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 .tag-input-section {
 }
 
@@ -397,6 +408,7 @@ export default {
   font-size: 0.9rem;
   font-weight: 500;
   max-width: 500px;
+  text-align: right;
 }
 .notification-box.success {
   color: #50ff78;
