@@ -22,12 +22,21 @@
     <div class="movie-info">
       <p><strong>{{ movie.runtime }}min</strong></p>
       <div class="genre-tags">
-      <span
-          class="genre-pill"
-          v-for="genre in movie.genres"
-          :key="genre.id"> {{ genre.name }}
-      </span>
+  <span
+      class="genre-pill"
+      v-for="genre in movie.genres"
+      :key="genre.id"
+  >{{ genre.name }}</span>
+
+        <span
+            class="tags-pill"
+            v-for="(tag, index) in tags"
+            :key="index"
+        >{{ tag }}</span>
       </div>
+
+
+
       <p><strong>Release Date:</strong> {{ movie.releaseDate}}</p>
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
@@ -47,56 +56,78 @@
   </div>
 </template>
 
-<script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { useRoute } from 'vue-router'
-  import Rating from './Rating.vue'
-  import MovieSeen from './MovieSeen.vue'
+<script>
+import Rating from './Rating.vue'
+import MovieSeen from './MovieSeen.vue'
 
-  const route = useRoute()
-
-  const movie = ref({})
-  const showRating = ref(false)
-  const ratings = ref([])
-
-  const productionCountries = computed(() =>
-  movie.value.production_countries?.map(c => c.name).join(', ') || ''
-  )
-
-  const posterUrl = computed(() =>
-  movie.value.poster_path
-  ? `https://image.tmdb.org/t/p/w500${movie.value.poster_path}`
-  : ''
-  )
-
-  onMounted(async () => {
-  try {
-  const response = await fetch(`http://localhost:8080/movie/${route.params.id}`)
-  const data = await response.json()
-  data.releaseDate = data.release_date
-  data.runningTime = data.runtime
-  movie.value = data
-
-  const statusResponse = await fetch(`http://localhost:8080/movie/status/${route.params.id}`)
-  if (statusResponse.status === 404) {
-  showRating.value = true
-} else {
-  const rawText = await statusResponse.text()
-  const dbStatus = JSON.parse(rawText)
-  showRating.value = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
+export default {
+  components: {
+    Rating,
+    MovieSeen
+  },
+  data() {
+    return {
+      movie: {},
+      showRating: false,
+      ratings: [],
+      tags: [],
+      routeId: this.$route.params.id
+    }
+  },
+  computed: {
+    productionCountries() {
+      return this.movie.production_countries?.map(c => c.name).join(', ') || ''
+    },
+    posterUrl() {
+      return this.movie.poster_path
+          ? `https://image.tmdb.org/t/p/w500${this.movie.poster_path}`
+          : ''
+    }
+  },
+  methods: {
+    async fetchMovieDetails() {
+      const response = await fetch(`http://localhost:8080/movie/${this.routeId}`)
+      const data = await response.json()
+      data.releaseDate = data.release_date
+      data.runningTime = data.runtime
+      this.movie = data
+    },
+    async fetchMovieStatus() {
+      const response = await fetch(`http://localhost:8080/movie/status/${this.routeId}`)
+      if (response.status === 404) {
+        this.showRating = true
+      } else {
+        const rawText = await response.text()
+        const dbStatus = JSON.parse(rawText)
+        this.showRating = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
+      }
+    },
+    async fetchRatings() {
+      const response = await fetch(`http://localhost:8080/ratings/movie/${this.routeId}`)
+      if (response.ok) {
+        this.ratings = await response.json()
+      } else {
+        console.warn("Keine Ratings gefunden")
+      }
+    },
+    async fetchTags() {
+      const response = await fetch(`http://localhost:8080/movie/${this.routeId}/tags`)
+      if (response.ok) {
+        this.tags = await response.json()
+      } else {
+        console.warn("Keine Tags vorhanden")
+      }
+    }
+  },
+  mounted() {
+    this.fetchMovieDetails()
+    this.fetchMovieStatus()
+    this.fetchRatings()
+    this.fetchTags()
+  }
 }
-
-  const ratingRes = await fetch(`http://localhost:8080/movie/ratings/${route.params.id}`)
-  if (ratingRes.ok) {
-  ratings.value = await ratingRes.json()
-} else {
-  console.warn("Keine Ratings gefunden")
-}
-} catch (err) {
-  console.error("Fehler beim Laden:", err)
-}
-})
 </script>
+
 
 
 <style scoped>
@@ -126,7 +157,7 @@
   margin-top: 1rem;
 }
 .rating-pill {
-  background-color: #415a77;
+  background-color: #3a2c5c;
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 0.85rem;
@@ -155,5 +186,15 @@
   white-space: nowrap;
   font-family: "Special Gothic Expanded One";
 }
-
+.tags-pill {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #999;
+  border-radius: 999px;
+  background-color: rgba(134, 53, 161, 0.52);
+  color: #fff;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  font-family: "Special Gothic Expanded One";
+  margin: 0 0 0 0;
+}
 </style>

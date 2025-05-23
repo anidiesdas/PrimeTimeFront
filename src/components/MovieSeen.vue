@@ -127,15 +127,19 @@ export default {
         return;
       }
 
-      const ratings = this.selectedUsers.map(user => ({
+      const payload = {
         movieId: this.movieId,
-        memberId: user.id,
-        rating: this.selectedStatus === 'COMPLETED'
-            ? Number(this.getRatingFor(user.id)) || 0
-            : null
-      }));
+        tags: this.tags,
+        ratings: this.selectedUsers.map(user => ({
+          movieId: this.movieId,
+          memberId: user.id,
+          rating: this.selectedStatus === 'COMPLETED'
+              ? Number(this.getRatingFor(user.id)) || 0
+              : null
+        }))
+      };
 
-      axios.post('http://localhost:8080/movie/update', ratings)
+      axios.post('http://localhost:8080/movie/update', payload)
           .then(() => {
             this.notification.message = 'Movie updated:))';
             this.notification.type = 'success';

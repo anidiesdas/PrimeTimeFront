@@ -100,7 +100,7 @@ export default {
       selectedPlatform: '',
       platforms: [
         {value: 'NETFLIX', label: 'Netflix'},
-        {value: 'PRIME_VIDEO', label: 'Prime Video'}, {value: 'DISNEY_PLUS', label: 'Disney+'},
+        {value: 'PRIME_VIDEO', label: 'Prime Video'},
         {value: 'DISNEY_PLUS', label: 'Disney+'},
         {value: 'BLURAY_DVD', label: 'Blu-ray/DVD'},
         {value: 'YOUTUBE', label: 'YouTube'},

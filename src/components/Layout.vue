@@ -22,25 +22,121 @@
             placeholder="Search..."
             class="search-input"
         />
-        <p2><strong>SDD Stats</strong></p2>
-        <p2>Plan To Watch:</p2>
-        <p2>Dropped:</p2>
-        <p2>Completed:</p2>
+
+        <h4><strong>SDD Stats</strong></h4>
+        <p class="spacer"></p>
+
+        <p>Plan To Watch: {{ statusCounts.PLAN_TO_WATCH || 0 }}</p>
+        <p>Dropped: {{ statusCounts.DROPPED || 0 }}</p>
+        <p>Completed: {{ statusCounts.COMPLETED || 0 }}</p>
+        <p class="spacer"></p>
+
+        <p><strong>Mean scores:</strong></p>
+        <p>{{averageScore}}</p>
+        <p class="spacer"></p>
+
+        <p><strong>Top 3 Genre:</strong></p>
+        <p>1.  {{ topGenres[0]}}</p>
+        <p>2.  {{ topGenres[1]}}</p>
+        <p>3.  {{ topGenres[2]}}</p>
+        <p class="spacer"></p>
+
+        <p><strong>Hall of Fame:</strong></p>
+        <p>1. {{topBestMovies[0]}}</p>
+        <p>2. {{topBestMovies[1]}}</p>
+        <p>3. {{topBestMovies[2]}}</p>
+        <p class="spacer"></p>
+
+        <p><strong>Walk of Shame:</strong></p>
+        <p>1. {{topWorstMovies[0]}}</p>
+        <p>2. {{topWorstMovies[1]}}</p>
+        <p>3. {{topWorstMovies[2]}}</p>
+        <p class="spacer"></p>
+
+        <p><strong>Total minutes: </strong>{{ totalMinutes }}</p>
+        <p class="spacer"></p>
+
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
+import axios from 'axios'
 
-const searchQuery = ref('')
-const router = useRouter()
-
-const submitSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push(`/search/${encodeURIComponent(searchQuery.value.trim())}`)
+export default {
+  data() {
+    return {
+      searchQuery: '',
+      totalMinutes: 0,
+      statusCounts: {},
+      topGenres: [],
+      averageScore: 0,
+      topBestMovies: [],
+      topWorstMovies: [],
+    }
+  },
+  methods: {
+    submitSearch() {
+      if (this.searchQuery.trim()) {
+        this.$router.push(`/search/${encodeURIComponent(this.searchQuery.trim())}`)
+      }
+    },
+    async fetchTotalRuntime() {
+      try {
+        const res = await fetch('http://localhost:8080/movie/total-runtime');
+        this.totalMinutes = await res.json();
+      } catch (err) {
+        console.error("Fehler beim Laden der Laufzeit:", err);
+      }
+    },
+    async fetchStatusCounts() {
+      try {
+        const res = await axios.get('http://localhost:8080/movie/status-counts');
+        this.statusCounts = res.data;
+      } catch (err) {
+        console.error("Fehler beim Laden der Status-Zahlen:", err);
+      }
+    },
+    async fetchTopGenres() {
+      try {
+        const res = await fetch('http://localhost:8080/movie/top-genres');
+        this.topGenres = await res.json();
+      } catch (err) {
+        console.error("Fehler beim Laden der Top-Genres:", err);
+      }
+    },
+    async fetchAverageRating() {
+      try {
+        const res = await fetch("http://localhost:8080/ratings/average-rating");
+        this.averageScore = await res.json();
+      } catch (err) {
+        console.error("Fehler beim Abrufen des Durchschnitts:", err);
+      }
+    },
+    async fetchBestMovies() {
+      const res = await fetch("http://localhost:8080/ratings/top-rated");
+      this.topBestMovies = await res.json();
+    },
+    async fetchWorstMovies() {
+      const res = await fetch("http://localhost:8080/ratings/worst-rated");
+      this.topWorstMovies = await res.json();
+    },
+  },
+  mounted() {
+    this.fetchTotalRuntime();
+    this.fetchStatusCounts();
+    this.fetchTopGenres();
+    this.fetchAverageRating();
+    this.fetchBestMovies();
+    this.fetchWorstMovies();
   }
 }
 </script>
+
+<style>
+h4 {
+  margin: 0 0 0 0;
+  font-family: "Special Gothic Expanded One";
+}
+</style>

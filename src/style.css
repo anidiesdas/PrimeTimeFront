@@ -213,4 +213,13 @@ p {
   width: 100%;
   margin-bottom: 2rem;
 }
+.sidebar p {
+  margin: 0 0 0 0;
+  font-size: 15px;
+  word-break: break-word;
+  font-family: 'Rubik';
+}
+.sidebar .spacer {
+  margin: 0.7rem 0;
+}
 
