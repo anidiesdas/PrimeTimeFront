@@ -86,14 +86,14 @@ export default {
   },
   methods: {
     async fetchMovieDetails() {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/movie/${this.routeId}")
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/movie/${this.routeId}`)
       const data = await response.json()
       data.releaseDate = data.release_date
       data.runningTime = data.runtime
       this.movie = data
     },
     async fetchMovieStatus() {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/movie/status/${this.routeId}")
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/movie/status/${this.routeId}`)
       if (response.status === 404) {
         this.showRating = true
       } else {
@@ -103,7 +103,7 @@ export default {
       }
     },
     async fetchRatings() {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/ratings/movie/${this.routeId}")
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/ratings/movie/${this.routeId}`)
       if (response.ok) {
         this.ratings = await response.json()
       } else {
@@ -111,7 +111,7 @@ export default {
       }
     },
     async fetchTags() {
-      const response = await fetch("${import.meta.env.VITE_API_URL}/movie/${this.routeId}/tags")
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/movie/${this.routeId}/tags`)
       if (response.ok) {
         this.tags = await response.json()
       } else {

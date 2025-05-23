@@ -84,7 +84,7 @@ export default {
     },
     async fetchTotalRuntime() {
       try {
-        const res = await fetch('${import.meta.env.VITE_API_URL}/movie/total-runtime');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/movie/total-runtime`);
         this.totalMinutes = await res.json();
       } catch (err) {
         console.error("Fehler beim Laden der Laufzeit:", err);
@@ -92,7 +92,7 @@ export default {
     },
     async fetchStatusCounts() {
       try {
-        const res = await axios.get('${import.meta.env.VITE_API_URL}/movie/status-counts');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/movie/status-counts`);
         this.statusCounts = res.data;
       } catch (err) {
         console.error("Fehler beim Laden der Status-Zahlen:", err);
@@ -100,7 +100,7 @@ export default {
     },
     async fetchTopGenres() {
       try {
-        const res = await fetch('${import.meta.env.VITE_API_URL}/movie/top-genres');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/movie/top-genres`);
         this.topGenres = await res.json();
       } catch (err) {
         console.error("Fehler beim Laden der Top-Genres:", err);
@@ -108,18 +108,18 @@ export default {
     },
     async fetchAverageRating() {
       try {
-        const res = await fetch("${import.meta.env.VITE_API_URL}/ratings/average-rating");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/ratings/average-rating`);
         this.averageScore = await res.json();
       } catch (err) {
         console.error("Fehler beim Abrufen des Durchschnitts:", err);
       }
     },
     async fetchBestMovies() {
-      const res = await fetch("${import.meta.env.VITE_API_URL}/ratings/top-rated");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/ratings/top-rated`);
       this.topBestMovies = await res.json();
     },
     async fetchWorstMovies() {
-      const res = await fetch("${import.meta.env.VITE_API_URL}/ratings/worst-rated");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/ratings/worst-rated`);
       this.topWorstMovies = await res.json();
     },
   },

@@ -225,7 +225,7 @@ export default {
         ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
       };
 
-      axios.post("${import.meta.env.VITE_API_URL}/movie/saving", payload)
+      axios.post(`${import.meta.env.VITE_API_URL}/movie/saving`, payload)
           .then(() => alert("Saved!"))
           .catch(err => {
             console.error("Fehler:", err.response?.data || err.message);

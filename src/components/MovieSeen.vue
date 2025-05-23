@@ -139,7 +139,7 @@ export default {
         }))
       };
 
-      axios.post("${import.meta.env.VITE_API_URL}/movie/update", payload)
+      axios.post(`${import.meta.env.VITE_API_URL}/movie/update`, payload)
           .then(() => {
             this.notification.message = 'Movie updated:))';
             this.notification.type = 'success';
