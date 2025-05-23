@@ -95,13 +95,13 @@ export default {
   },
   methods: {
     fetchUsers() {
-      fetch('http://localhost:8080/members')
+      fetch("${import.meta.env.VITE_API_URL}/members")
           .then(response => response.json())
           .then(data => {
             this.allUsers = data;
           })
           .catch(error => {
-            console.error('Error', error);
+            console.error("Error", error);
           });
     },
     toggleDropdown() {
@@ -139,7 +139,7 @@ export default {
         }))
       };
 
-      axios.post('http://localhost:8080/movie/update', payload)
+      axios.post("${import.meta.env.VITE_API_URL}/movie/update", payload)
           .then(() => {
             this.notification.message = 'Movie updated:))';
             this.notification.type = 'success';
