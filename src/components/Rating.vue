@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     fetchUsers() {
-      fetch("${import.meta.env.VITE_API_URL}/members")
+      fetch(`${import.meta.env.VITE_API_URL}members`)
           .then(response => response.json())
           .then(data => {
             this.allUsers = data;
@@ -225,7 +225,7 @@ export default {
         ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
       };
 
-      axios.post(`${import.meta.env.VITE_API_URL}/movie/saving`, payload)
+      axios.post(`${import.meta.env.VITE_API_URL}movie/saving`, payload)
           .then(() => alert("Saved!"))
           .catch(err => {
             console.error("Fehler:", err.response?.data || err.message);

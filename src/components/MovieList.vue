@@ -46,7 +46,7 @@ function getPosterUrl(path) {
 
 onMounted(async () => {
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/popular`)
+    const res = await fetch(`${import.meta.env.VITE_API_URL}popular`)
     const data = await res.json()
     movies.value = data.results
   } catch (err) {

@@ -95,7 +95,7 @@ export default {
   },
   methods: {
     fetchUsers() {
-      fetch("${import.meta.env.VITE_API_URL}/members")
+      fetch("${import.meta.env.VITE_API_URL}members")
           .then(response => response.json())
           .then(data => {
             this.allUsers = data;
@@ -139,7 +139,7 @@ export default {
         }))
       };
 
-      axios.post(`${import.meta.env.VITE_API_URL}/movie/update`, payload)
+      axios.post(`${import.meta.env.VITE_API_URL}movie/update`, payload)
           .then(() => {
             this.notification.message = 'Movie updated:))';
             this.notification.type = 'success';

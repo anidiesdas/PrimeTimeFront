@@ -48,7 +48,7 @@ const fetchMovies = async () => {
   if (!query.value) return
   isLoading.value = true
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/search/${encodeURIComponent(query.value)}`)
+    const res = await fetch(`${import.meta.env.VITE_API_URL}search/${encodeURIComponent(query.value)}`)
     const data = await res.json()
     movies.value = data.results || []
   } catch (err) {
