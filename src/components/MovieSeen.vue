@@ -95,13 +95,17 @@ export default {
   },
   methods: {
     fetchUsers() {
-      fetch("${import.meta.env.VITE_API_URL}members")
-          .then(response => response.json())
+      fetch(`${import.meta.env.VITE_API_URL}members`)
+          .then(async response => {
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Fehler vom Server: ${response.status} - ${errorText}`);
+            } return response.json(); })
           .then(data => {
             this.allUsers = data;
           })
           .catch(error => {
-            console.error("Error", error);
+            console.error("Fehler beim Laden der Nutzer:", error);
           });
     },
     toggleDropdown() {

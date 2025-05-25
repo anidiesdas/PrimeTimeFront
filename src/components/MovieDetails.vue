@@ -11,31 +11,38 @@
     <div class="left-column">
       <img :src="posterUrl" class="poster" />
 
+      <p v-if="averageMovieRating !== null">
+        {{ averageMovieRating.toFixed(2) }}⭐
+      </p>
+
       <div class="ratings-box">
         <div v-for="r in ratings" :key="r.memberId" class="rating-pill">
           {{ r.memberName }}: {{ r.rating }}
         </div>
       </div>
+
     </div>
 
 
     <div class="movie-info">
       <p><strong>{{ movie.runtime }}min</strong></p>
-      <div class="genre-tags">
-  <span
-      class="genre-pill"
-      v-for="genre in movie.genres"
-      :key="genre.id"
-  >{{ genre.name }}</span>
+        <div class="genre-tags">
+
+        <span
+            class="genre-pill"
+            v-for="genre in movie.genres"
+            :key="genre.id"
+        >{{ genre.name }}
+        </span>
 
         <span
             class="tags-pill"
             v-for="(tag, index) in tags"
             :key="index"
-        >{{ tag }}</span>
-      </div>
+        >{{ tag }}
+        </span>
 
-
+        </div>
 
       <p><strong>Release Date:</strong> {{ movie.releaseDate}}</p>
       <p><strong>Production:</strong> {{ productionCountries }}</p>
@@ -71,7 +78,7 @@ export default {
       showRating: false,
       ratings: [],
       tags: [],
-      routeId: this.$route.params.id
+      routeId: this.$route.params.id,
     }
   },
   computed: {
@@ -82,6 +89,11 @@ export default {
       return this.movie.poster_path
           ? `https://image.tmdb.org/t/p/w500${this.movie.poster_path}`
           : ''
+    },
+    averageMovieRating() {
+      if (this.ratings.length === 0) return null;
+      const total = this.ratings.reduce((sum, entry) => sum + entry.rating, 0);
+      return total / this.ratings.length;
     }
   },
   methods: {
@@ -94,7 +106,7 @@ export default {
     },
     async fetchMovieStatus() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}movie/status/${this.routeId}`)
-      if (response.status === 404) {
+      if (response.ok) {
         this.showRating = true
       } else {
         const rawText = await response.text()
@@ -107,15 +119,24 @@ export default {
       if (response.ok) {
         this.ratings = await response.json()
       } else {
-        console.warn("Keine Ratings gefunden")
+        console.log("Keine Ratings gefunden")
       }
     },
     async fetchTags() {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}movie/${this.routeId}/tags`)
-      if (response.ok) {
-        this.tags = await response.json()
-      } else {
-        console.warn("Keine Tags vorhanden")
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}movie/${this.routeId}/tags`);
+        if (!response.ok) {
+          console.log("Fehler beim Laden der Tags");
+          return;
+        }
+        const text = await response.text();
+        if (!text) {
+          console.log("Keine Tags vorhanden");
+          return;
+        }
+        this.tags = JSON.parse(text);
+      } catch (err) {
+        console.log("Fehler beim Parsen der Tags");
       }
     }
   },
@@ -140,21 +161,30 @@ export default {
 .left-column {
   display: flex;
   flex-direction: column;
-  margin: 0
+  margin: 0;
+  width: 300px;
+  align-items: center;
+}
+.left-column p {
+  font-size: 20px;
+  justify-content: center;
 }
 .poster {
-  width: 280px;
+  width: 300px;
   height: 100%;
   border-radius: 8px;
   object-fit: cover;
   margin: 0;
+  margin-bottom: 1rem;
 }
 .ratings-box {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  margin-top: 1rem;
+  margin: 0rem 0 1rem 0;
+  max-width: 100%;
+  max-height: 100%;
 }
 .rating-pill {
   background-color: #3a2c5c;

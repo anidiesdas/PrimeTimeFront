@@ -26,14 +26,20 @@
         <h4><strong>SDD Stats</strong></h4>
         <p class="spacer"></p>
 
-        <p>Plan To Watch: {{ statusCounts.PLAN_TO_WATCH || 0 }}</p>
-        <p>Dropped: {{ statusCounts.DROPPED || 0 }}</p>
-        <p>Completed: {{ statusCounts.COMPLETED || 0 }}</p>
+        <p>⏰Plan To Watch: {{ statusCounts.PLAN_TO_WATCH || 0 }}</p>
+        <p>🫸Dropped: {{ statusCounts.DROPPED || 0 }}</p>
+        <p>✅Completed: {{ statusCounts.COMPLETED || 0 }}</p>
         <p class="spacer"></p>
 
-        <p><strong>Mean scores:</strong></p>
-        <p>{{averageScore}}</p>
+        <p><strong>💩Mean scores:</strong></p>
+        <p>{{averageScore.toFixed(4)}}</p>
         <p class="spacer"></p>
+
+        <div class= "member-rating" v-for="entry in memberRatings" :key="entry.memberName">
+          {{ entry.averageRating.toFixed(2) }}🤍 - {{ entry.memberName }}
+        </div>
+        <p class="spacer"></p>
+
 
         <p><strong>Total minutes: </strong>{{ totalMinutes }}</p>
         <p class="spacer"></p>
@@ -55,6 +61,7 @@ export default {
       totalMinutes: 0,
       statusCounts: {},
       averageScore: 0,
+      memberRatings: [],
     }
   },
   methods: {
@@ -87,11 +94,20 @@ export default {
         console.error("Fehler beim Abrufen des Durchschnitts:", err);
       }
     },
+    async fetchMemberRatings() {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/average-by-member`)
+        this.memberRatings = await res.json()
+      } catch (err) {
+        console.error('Fehler beim Laden der Durchschnittswerte:', err)
+      }
+    },
   },
   mounted() {
     this.fetchTotalRuntime();
     this.fetchStatusCounts();
     this.fetchAverageRating();
+    this.fetchMemberRatings();
   }
 }
 </script>
@@ -100,5 +116,9 @@ export default {
 h4 {
   margin: 0 0 0 0;
   font-family: "Special Gothic Expanded One";
+}
+
+.member-rating {
+  list-style: none;
 }
 </style>

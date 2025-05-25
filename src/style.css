@@ -105,7 +105,7 @@ html, body {
 /* Sidebar + Suche */
 .sidebar {
   flex: 0.5;
-  border-left: 1px solid rgba(255, 255, 255, 0.51);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.51);
   font-size: 0.95rem;
   display: flex;
   flex-direction: column;
@@ -223,3 +223,8 @@ p {
   display: block;
 }
 
+.custom-line {
+  border: none;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.51);
+}

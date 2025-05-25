@@ -10,14 +10,14 @@
 
   <div class="hall-container">
     <div class="hall">
-    <h2>Top 3 Genre🤠:</h2>
+    <h2>Top 3 Genre👀:</h2>
     <p>1.  {{ topGenres[0]}}</p>
     <p>2.  {{ topGenres[1]}}</p>
     <p>3.  {{ topGenres[2]}}</p>
     </div>
 
     <div class="hall">
-    <h2>Hall of Fame🤩:</h2>
+    <h2>Hall of Fame🫦:</h2>
     <p>1. {{topBestMovies[0]}}</p>
     <p>2. {{topBestMovies[1]}}</p>
     <p>3. {{topBestMovies[2]}}</p>
@@ -30,6 +30,8 @@
     <p>3. {{topWorstMovies[2]}}</p>
     </div>
   </div>
+
+  <hr class="custom-line" />
 
   <div class="movie-list">
     <h2>🎬⭐Trending Movies</h2>
@@ -123,6 +125,7 @@ export default {
   justify-content: space-around;
   gap: 6rem;
   flex-wrap: wrap;
+  margin-bottom: 2rem;
 }
 .hall-container h2 {
   margin-bottom: 0.7rem;

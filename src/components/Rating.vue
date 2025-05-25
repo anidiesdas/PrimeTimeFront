@@ -226,7 +226,6 @@ export default {
       };
 
       axios.post(`${import.meta.env.VITE_API_URL}movie/saving`, payload)
-          .then(() => alert("Saved!"))
           .catch(err => {
             console.error("Fehler:", err.response?.data || err.message);
             alert("Error: " + JSON.stringify(err.response?.data));
