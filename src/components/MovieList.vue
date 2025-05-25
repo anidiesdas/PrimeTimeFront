@@ -29,28 +29,35 @@
 </template>
 
 
-
-<script setup>
-import {ref, onMounted} from 'vue'
+<script>
 import { genreMap } from '@/genre'
 
-const movies = ref([])
-
-const getGenreNames = (ids) => {
-  return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
-}
-
-function getPosterUrl(path) {
-  return path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/100x150?text=No+Image'
-}
-
-onMounted(async () => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}popular`)
-    const data = await res.json()
-    movies.value = data.results
-  } catch (err) {
-    console.error('Fehler beim Laden der Filme:', err)
+export default {
+  name: 'YourComponentName',
+  data() {
+    return {
+      movies: []
+    }
+  },
+  methods: {
+    getGenreNames(ids) {
+      return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
+    },
+    getPosterUrl(path) {
+      return path ? `https://image.tmdb.org/t/p/w500${path}` : ''
+    },
+    async fetchPopularMovies() {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}popular`)
+        const data = await res.json()
+        this.movies = data.results
+      } catch (err) {
+        console.error('Error:', err)
+      }
+    }
+  },
+  mounted() {
+    this.fetchPopularMovies()
   }
-})
+}
 </script>

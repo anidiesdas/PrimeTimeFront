@@ -33,49 +33,67 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted, ref, watch } from 'vue'
+<script>
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { genreMap } from '@/genre'
 
-const route = useRoute()
-const query = ref(route.params.query)
-const searchQuery = ref(query.value)
-const movies = ref([])
-const isLoading = ref(false)
+export default {
+  setup() {
+    const route = useRoute()
+    const query = ref(route.params.query)
+    const searchQuery = ref(query.value)
+    const movies = ref([])
+    const isLoading = ref(false)
 
-const fetchMovies = async () => {
-  if (!query.value) return
-  isLoading.value = true
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}search/${encodeURIComponent(query.value)}`)
-    const data = await res.json()
-    movies.value = data.results || []
-  } catch (err) {
-    console.error('Error...:', err)
-  } finally {
-    isLoading.value = false
+    const fetchMovies = async () => {
+      if (!query.value) return
+      isLoading.value = true
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}search/${encodeURIComponent(query.value)}`)
+        const data = await res.json()
+        movies.value = data.results || []
+      } catch (err) {
+        console.error('Error...:', err)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    const getGenreNames = (ids) => {
+      return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
+    }
+
+    const getPosterUrl = (path) => {
+      return path
+          ? `https://image.tmdb.org/t/p/w500${path}`
+          : 'https://via.placeholder.com/90x135?text=No+Image'
+    }
+
+    onMounted(() => {
+      fetchMovies()
+      searchQuery.value = query.value
+    })
+
+    watch(() => route.params.query, (newQuery) => {
+      query.value = newQuery
+      searchQuery.value = newQuery
+      fetchMovies()
+    })
+
+    return {
+      query,
+      searchQuery,
+      movies,
+      isLoading,
+      fetchMovies,
+      getGenreNames,
+      getPosterUrl
+    }
   }
 }
-
-const getGenreNames = (ids) => {
-  return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
-}
-
-onMounted(() => {
-  fetchMovies()
-  searchQuery.value = query.value
-})
-
-watch(() => route.params.query, (newQuery) => {
-  query.value = newQuery
-  searchQuery.value = newQuery
-  fetchMovies()
-})
-
-const getPosterUrl = (path) =>
-    path ? `https://image.tmdb.org/t/p/w500${path}` : 'https://via.placeholder.com/90x135?text=No+Image'
 </script>
+
 
 <style scoped>
 .searched-query {

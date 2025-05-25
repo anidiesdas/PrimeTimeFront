@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Special+Gothic+Expanded+One&display=swap');
 
-/* === Allgemein === */
+/* Allgemein */
 #app,
 .app-container {
   width: 100%;
@@ -33,7 +33,7 @@ html, body {
   color: white;
 }
 
-/* === Navigation === */
+/* Navigation */
 .navbar {
   position: relative;
   top: 0;
@@ -73,7 +73,7 @@ html, body {
   text-shadow: 1px 1px 0 rgba(235, 240, 241, 0.63);
 }
 
-/* === Willkommen === */
+/* Header */
 .content-wrapper {
   width: 100%;
 }
@@ -102,7 +102,40 @@ html, body {
   gap: 0;
 }
 
-/* === Hauptinhalt === */
+/* Sidebar + Suche */
+.sidebar {
+  flex: 0.5;
+  border-left: 1px solid rgba(255, 255, 255, 0.51);
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem 0 1rem;
+  margin-top: 1rem;
+  font-family: 'Rubik';
+  line-height: 1.5;
+}
+
+.search-input {
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background-color: #a0bbd8;
+  border: none;
+  font-size: 0.95rem;
+  width: 100%;
+  margin-bottom: 2rem;
+  cursor: text;
+}
+.sidebar p {
+  margin: 0 0 0 0;
+  font-size: 15px;
+  word-break: break-word;
+  font-family: 'Rubik';
+}
+.sidebar .spacer {
+  margin: 0.7rem 0;
+}
+
+/* Main Content */
 .main-section {
   display: flex;
   align-content: flex-start;
@@ -117,7 +150,7 @@ html, body {
   flex: 3;
 }
 
-/* === Filmübersicht === */
+/* Filmübersicht */
 .movie-list {
   margin-top: 1.5rem;
   width: 100%;
@@ -133,7 +166,7 @@ html, body {
   gap: 1rem;
 }
 
-/* === MovieCard === */
+/* MovieCard */
 .movie-card {
   background-color: #444;
   border-radius: 1rem;
@@ -188,38 +221,5 @@ p {
   text-decoration: none;
   color: inherit;
   display: block;
-}
-
-
-/* === Sidebar + Suche === */
-.sidebar {
-  flex: 0.5;
-  border-left: 1px solid rgba(255, 255, 255, 0.51);
-  font-size: 0.95rem;
-  display: flex;
-  flex-direction: column;
-  padding: 0 1rem 0 1rem;
-  margin-top: 1rem;
-  font-family: 'Rubik';
-  line-height: 1.5;
-}
-
-.search-input {
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
-  background-color: #a0bbd8;
-  border: none;
-  font-size: 0.95rem;
-  width: 100%;
-  margin-bottom: 2rem;
-}
-.sidebar p {
-  margin: 0 0 0 0;
-  font-size: 15px;
-  word-break: break-word;
-  font-family: 'Rubik';
-}
-.sidebar .spacer {
-  margin: 0.7rem 0;
 }
 

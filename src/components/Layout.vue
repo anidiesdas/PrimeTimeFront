@@ -3,10 +3,10 @@
     <nav class="navbar">
       <div class="nav-links">
         <router-link to="/popular">Trending</router-link>
-        <a>Plan To Watch</a>
-        <a>Dropped</a>
-        <a>Completed</a>
-        <a>Statistics</a>
+        <router-link to="/plantowatch">Plan To Watch</router-link>
+        <router-link to="/completed">Completed</router-link>
+        <router-link to="/dropped">Dropped</router-link>
+        <router-link to="/statistics">Statistics</router-link>
       </div>
     </nav>
 
@@ -35,24 +35,6 @@
         <p>{{averageScore}}</p>
         <p class="spacer"></p>
 
-        <p><strong>Top 3 Genre:</strong></p>
-        <p>1.  {{ topGenres[0]}}</p>
-        <p>2.  {{ topGenres[1]}}</p>
-        <p>3.  {{ topGenres[2]}}</p>
-        <p class="spacer"></p>
-
-        <p><strong>Hall of Fame:</strong></p>
-        <p>1. {{topBestMovies[0]}}</p>
-        <p>2. {{topBestMovies[1]}}</p>
-        <p>3. {{topBestMovies[2]}}</p>
-        <p class="spacer"></p>
-
-        <p><strong>Walk of Shame:</strong></p>
-        <p>1. {{topWorstMovies[0]}}</p>
-        <p>2. {{topWorstMovies[1]}}</p>
-        <p>3. {{topWorstMovies[2]}}</p>
-        <p class="spacer"></p>
-
         <p><strong>Total minutes: </strong>{{ totalMinutes }}</p>
         <p class="spacer"></p>
 
@@ -63,17 +45,16 @@
 
 <script>
 import axios from 'axios'
+import Statistics from "@/components/Statistics.vue";
 
 export default {
+  components: {Statistics},
   data() {
     return {
       searchQuery: '',
       totalMinutes: 0,
       statusCounts: {},
-      topGenres: [],
       averageScore: 0,
-      topBestMovies: [],
-      topWorstMovies: [],
     }
   },
   methods: {
@@ -98,14 +79,6 @@ export default {
         console.error("Fehler beim Laden der Status-Zahlen:", err);
       }
     },
-    async fetchTopGenres() {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}movie/top-genres`);
-        this.topGenres = await res.json();
-      } catch (err) {
-        console.error("Fehler beim Laden der Top-Genres:", err);
-      }
-    },
     async fetchAverageRating() {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/average-rating`);
@@ -114,22 +87,11 @@ export default {
         console.error("Fehler beim Abrufen des Durchschnitts:", err);
       }
     },
-    async fetchBestMovies() {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/top-rated`);
-      this.topBestMovies = await res.json();
-    },
-    async fetchWorstMovies() {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/worst-rated`);
-      this.topWorstMovies = await res.json();
-    },
   },
   mounted() {
     this.fetchTotalRuntime();
     this.fetchStatusCounts();
-    this.fetchTopGenres();
     this.fetchAverageRating();
-    this.fetchBestMovies();
-    this.fetchWorstMovies();
   }
 }
 </script>
