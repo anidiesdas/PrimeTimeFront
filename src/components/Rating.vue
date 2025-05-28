@@ -179,7 +179,7 @@ export default {
       if (this.selectedStatus === 'COMPLETED') {
         const hasMissingRatings = this.selectedUsers.some(user => {
           const rating = this.ratingsByUser[user.id];
-          return rating === undefined || rating === '';
+          return rating === undefined || rating === null || isNaN(rating) || rating < 0 || rating > 10;
         });
 
         if (hasMissingRatings) {
@@ -191,9 +191,20 @@ export default {
 
       return true;
     },
-    saveData() {
+    async saveData() {
       if (!this.isValid()) {
         return;
+      }
+
+      let password = null;
+
+      if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus)) {
+        password = prompt("Please enter the correct code to save");
+        if (!password) {
+          this.notification.message = "Saving canceled";
+          this.notification.type = 'error';
+          return;
+        }
       }
 
       let ratings = [];
@@ -220,19 +231,28 @@ export default {
           status: this.selectedStatus,
           watchDate: this.selectedDate || null,
           platform: this.selectedPlatform || null,
-          tags: this.tags
+          tags: this.tags,
         },
-        ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings
+        ratings: this.selectedStatus === 'PLAN_TO_WATCH' ? [] : ratings,
+        password: password,
       };
 
-      axios.post(`${import.meta.env.VITE_API_URL}movie/saving`, payload)
-          .catch(err => {
-            console.error("Fehler:", err.response?.data || err.message);
-            alert("Error: " + JSON.stringify(err.response?.data));
-          });
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}movie/saving`, payload);
 
-      this.notification.message = 'Movie saved:))';
-      this.notification.type = 'success';
+        if (response.data === 'INVALID_PASSWORD') {
+          this.notification.message = 'Invalid password:(';
+          this.notification.type = 'error';
+          return;
+        }
+
+        this.notification.message = 'Movie saved:))';
+        this.notification.type = 'success';
+
+      } catch (err) {
+        this.notification.message = (err.response?.data || err.message);
+        this.notification.type = 'error';
+      }
     },
   },
   watch: {
@@ -259,7 +279,7 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   position: relative;
   font-family: 'Rubik';
-  margin: 2rem 0 5rem 0;
+  margin: 2rem 0 1rem 0;
 }
 .status-row {
   display: flex;
@@ -305,7 +325,7 @@ export default {
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 8px 10px;
-  margin: 3px 0 0.5rem 0.5rem;
+  margin: 3px 0 0rem 0.5rem;
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;

@@ -44,7 +44,11 @@
 
         </div>
 
-      <p><strong>Release Date:</strong> {{ movie.releaseDate}}</p>
+      <p>
+        <strong>Release Date:</strong> {{ movie.releaseDate }}
+        <span v-if="watchDate"> // <strong>Watch Date:</strong> {{ watchDate }}</span>
+      </p>
+
       <p><strong>Production:</strong> {{ productionCountries }}</p>
       <p><strong>Overview:</strong> {{ movie.overview }}</p>
       <Rating
@@ -56,9 +60,11 @@
           :movie-genres="movie.genres"
       />
       <MovieSeen
-          v-if="!showRating && movie.id"
+          v-if="!showRating"
           :movie-id="movie.id"
       />
+
+      <p v-if="alreadyPlanned" style="color: #4488ca;">P.S. Dieser Film ist bereits in der Watchlist.</p>
     </div>
   </div>
 </template>
@@ -76,6 +82,8 @@ export default {
     return {
       movie: {},
       showRating: false,
+      watchDate: null,
+      alreadyPlanned: false,
       ratings: [],
       tags: [],
       routeId: this.$route.params.id,
@@ -105,14 +113,25 @@ export default {
       this.movie = data
     },
     async fetchMovieStatus() {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}movie/status/${this.routeId}`)
-      if (response.ok) {
-        this.showRating = true
-      } else {
-        const rawText = await response.text()
-        const dbStatus = JSON.parse(rawText)
-        this.showRating = dbStatus === 'PLAN_TO_WATCH' || dbStatus === 'null'
+      const response = await fetch(`${import.meta.env.VITE_API_URL}movie/status/${this.routeId}`);
+      const text = await response.text();
+      if (!text) {
+        this.showRating = true;
+        return;
       }
+
+      const data = JSON.parse(text);
+
+      if (data === null) {
+        this.showRating = true;
+        return;
+      }
+
+      const status = data?.status ?? null;
+
+      this.showRating = status === 'PLAN_TO_WATCH' || status === null;
+      this.alreadyPlanned = status === 'PLAN_TO_WATCH';
+      this.watchDate = data?.watchDate || null;
     },
     async fetchRatings() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}ratings/movie/${this.routeId}`)
@@ -230,3 +249,4 @@ export default {
 </style>
 
 <!--TODO Movie delete-->
+<!--TODO Rating-Funktionen Passwort schützen-->

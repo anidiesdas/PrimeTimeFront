@@ -131,6 +131,15 @@ export default {
         return;
       }
 
+      const password = prompt("Please enter the correct code to save");
+      if (!password) {
+        this.notification.message = 'Speichern abgebrochen: Kein Passwort eingegeben.';
+        this.notification.type = 'error';
+        return;
+      }
+
+      const correctPassword = '1210';
+
       const payload = {
         movieId: this.movieId,
         tags: this.tags,
@@ -177,7 +186,7 @@ export default {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   position: relative;
   font-family: 'Rubik';
-  margin: 2rem 0 5rem 0;
+  margin: 2rem 0 1rem 0;
 }
 .status-row {
   display: flex;
@@ -221,7 +230,7 @@ export default {
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 8px 10px;
-  margin: 3px 0 0.5rem 0.5rem;
+  margin: 3px 0 0 0.5rem;
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;

@@ -31,8 +31,8 @@
         <p>✅Completed: {{ statusCounts.COMPLETED || 0 }}</p>
         <p class="spacer"></p>
 
-        <p><strong>💩Mean scores:</strong></p>
-        <p>{{averageScore.toFixed(4)}}</p>
+        <p><strong>Mean scores:</strong></p>
+        <p>💩{{averageScore.toFixed(4)}}💩</p>
         <p class="spacer"></p>
 
         <div class= "member-rating" v-for="entry in memberRatings" :key="entry.memberName">

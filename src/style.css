@@ -154,6 +154,7 @@ html, body {
 .movie-list {
   margin-top: 1.5rem;
   width: 100%;
+  margin-bottom: 3rem;
 }
 
 .movie-list h2 {
