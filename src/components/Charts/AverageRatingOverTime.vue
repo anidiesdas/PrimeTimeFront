@@ -7,6 +7,8 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
 import { ref, onMounted } from 'vue'
 import { Line } from 'vue-chartjs'
 import 'chartjs-adapter-date-fns'
@@ -41,21 +43,13 @@ const chartData = ref({
   }]
 })
 
-const options = {
+const options = ref({
   responsive: true,
   plugins: {
     legend: { position: 'top' },
-    title: function(context) {
-      const date = new Date(context[0].parsed.x)
-      return date.toLocaleDateString('de-DE', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    },
     tooltip: {
       callbacks: {
-        title: function(context) {
+        title(context) {
           const date = new Date(context[0].parsed.x)
           return date.toLocaleDateString('de-DE', {
             year: 'numeric',
@@ -63,7 +57,7 @@ const options = {
             day: 'numeric'
           })
         },
-        label: function(context) {
+        label(context) {
           const point = context.raw
           return [`🎬 ${point.title}`, `⭐ Rating: ${point.y}`]
         }
@@ -90,15 +84,23 @@ const options = {
         minRotation: 45
       }
     }
+  },
+  onClick(event, elements, chart) {
+    if (!elements.length) return
+    const { datasetIndex, index } = elements[0]
+    const dataPoint = chart.data.datasets[datasetIndex].data[index]
+    if (dataPoint.movieId) {
+      router.push(`/movie/${dataPoint.movieId}`)
+    }
   }
-}
+})
 
 
 onMounted(async () => {
   const res = await fetch(`${import.meta.env.VITE_API_URL}movie/completed`)
   const movies = await res.json()
 
-  const ratingMap = {}
+  const ratingMap = {} // <-- FEHLTE
 
   movies.forEach(movie => {
     if (!movie.watchDate || !movie.ratings?.length) return
@@ -112,22 +114,32 @@ onMounted(async () => {
     const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length
 
     if (!ratingMap[date]) {
-      ratingMap[date] = { total: avg, count: 1, titles: [title] }
+      ratingMap[date] = {
+        total: avg,
+        count: 1,
+        entries: [{ id: movie.id, title }]
+      }
     } else {
       ratingMap[date].total += avg
       ratingMap[date].count++
-      ratingMap[date].titles.push(title)
+      ratingMap[date].entries.push({ id: movie.id, title })
     }
   })
 
   const sortedDates = Object.keys(ratingMap).sort((a, b) => new Date(a) - new Date(b))
 
   chartData.value.labels = sortedDates
-  chartData.value.datasets[0].data = sortedDates.map(date => ({
-    x: date,
-    y: Number((ratingMap[date].total / ratingMap[date].count).toFixed(2)),
-    title: ratingMap[date].titles.join(', ')
-  }))
+  chartData.value.datasets[0].data = sortedDates.map(date => {
+    const avg = Number((ratingMap[date].total / ratingMap[date].count).toFixed(2))
+    const entry = ratingMap[date].entries[0] // z.B. erster Film des Datums
+    return {
+      x: date,
+      y: avg,
+      title: entry.title,
+      movieId: entry.id
+    }
+  })
 })
+
 
 </script>
