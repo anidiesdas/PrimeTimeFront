@@ -1,5 +1,14 @@
 <template>
   <div class="form-box">
+
+    <div v-if="showPasswordModal" class="modal">
+      <div class="modal-content">
+        <input type="password" v-model="enteredPassword" placeholder="Enter password" />
+        <button @click="confirmPassword">OK</button>
+        <button @click="cancelPassword">Cancel</button>
+      </div>
+    </div>
+
     <div class="status-row">
       <div class="status-controls">
         <select v-model="selectedStatus">
@@ -111,7 +120,10 @@ export default {
         {value: 'RTL_PLUS', label: 'RTL+'},
         {value: 'OTHER', label: 'Other'},
       ],
-      notification: {message: '', type: ''}
+      notification: {message: '', type: ''},
+      showPasswordModal: false,
+      enteredPassword: '',
+      passwordCallback: null,
     }
   },
   props: {
@@ -150,6 +162,20 @@ export default {
     },
     removeTag(index) {
       this.tags.splice(index, 1);
+    },
+    requestPassword(callback) {
+      this.passwordCallback = callback;
+      this.showPasswordModal = true;
+    },
+    confirmPassword() {
+      this.showPasswordModal = false;
+      this.passwordCallback(this.enteredPassword);
+      this.enteredPassword = '';
+    },
+    cancelPassword() {
+      this.showPasswordModal = false;
+      this.passwordCallback(null);
+      this.enteredPassword = '';
     },
     isValid() {
       // status muss ausgewählt sein
@@ -196,17 +222,20 @@ export default {
         return;
       }
 
-      let password = null;
-
       if (['DROPPED', 'COMPLETED'].includes(this.selectedStatus)) {
-        password = prompt("Please enter the correct code to save");
-        if (!password) {
-          this.notification.message = "Saving canceled";
-          this.notification.type = 'error';
-          return;
-        }
+        this.requestPassword(async (password) => {
+          if (!password) {
+            this.notification.message = "Saving canceled";
+            this.notification.type = 'error';
+            return;
+          }
+          await this.sendMovieData(password);
+        });
+        return;
       }
-
+      await this.sendMovieData(null);
+    },
+    async sendMovieData(password) {
       let ratings = [];
 
       if (this.selectedStatus === 'COMPLETED') {
@@ -253,7 +282,7 @@ export default {
         this.notification.message = (err.response?.data || err.message);
         this.notification.type = 'error';
       }
-    },
+    }
   },
   watch: {
     selectedStatus(newStatus) {
@@ -435,4 +464,34 @@ input[type="number"] {
 .notification-box.error {
   color: #ff5252;
 }
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.modal-content input {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.modal-content button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 </style>

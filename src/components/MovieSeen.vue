@@ -1,5 +1,14 @@
 <template>
   <div class="form-box">
+
+    <div v-if="showPasswordModal" class="modal">
+      <div class="modal-content">
+        <input type="password" v-model="enteredPassword" placeholder="Enter password" />
+        <button @click="confirmPassword">OK</button>
+        <button @click="cancelPassword">Cancel</button>
+      </div>
+    </div>
+
     <div class="status-row">
       <div class="status-controls">
         <select v-model="selectedStatus">
@@ -84,7 +93,10 @@ export default {
       ratingsByUser: {},
       newTag: '',
       tags: [],
-      notification: {message: '', type: ''}
+      notification: {message: '', type: ''},
+      showPasswordModal: false,
+      enteredPassword: '',
+      passwordCallback: null,
     }
   },
   props: {
@@ -124,6 +136,20 @@ export default {
     removeTag(index) {
       this.tags.splice(index, 1);
     },
+    requestPassword(callback) {
+      this.passwordCallback = callback;
+      this.showPasswordModal = true;
+    },
+    confirmPassword() {
+      this.showPasswordModal = false;
+      this.passwordCallback(this.enteredPassword);
+      this.enteredPassword = '';
+    },
+    cancelPassword() {
+      this.showPasswordModal = false;
+      this.passwordCallback(null);
+      this.enteredPassword = '';
+    },
     updateData() {
       if (this.selectedUsers.length === 0) {
         this.notification.message = "Select a user grrr";
@@ -131,38 +157,44 @@ export default {
         return;
       }
 
-      const password = prompt("Please enter the correct code to save");
-      if (!password) {
-        this.notification.message = 'Speichern abgebrochen: Kein Passwort eingegeben.';
-        this.notification.type = 'error';
-        return;
-      }
+      this.requestPassword(async (password) => {
+        if (!password) {
+          this.notification.message = 'Abgebrochen: kein Passwort eingegeben.';
+          this.notification.type = 'error';
+          return;
+        }
 
-      const correctPassword = '1210';
-
-      const payload = {
-        movieId: this.movieId,
-        tags: this.tags,
-        ratings: this.selectedUsers.map(user => ({
+        const payload = {
           movieId: this.movieId,
-          memberId: user.id,
-          rating: this.selectedStatus === 'COMPLETED'
-              ? Number(this.getRatingFor(user.id)) || 0
-              : null
-        }))
-      };
+          tags: this.tags,
+          ratings: this.selectedUsers.map(user => ({
+            movieId: this.movieId,
+            memberId: user.id,
+            rating: this.selectedStatus === 'COMPLETED'
+                ? Number(this.getRatingFor(user.id)) || 0
+                : null
+          })),
+          password: password
+        };
 
-      axios.post(`${import.meta.env.VITE_API_URL}movie/update`, payload)
-          .then(() => {
-            this.notification.message = 'Movie updated:))';
-            this.notification.type = 'success';
-          })
-          .catch(err => {
-            console.error("Fehler:", err.response?.data || err.message);
-            this.notification.message = "Error";
-            this.notification.type = "error";
-          });
-    }
+        axios.post(`${import.meta.env.VITE_API_URL}movie/update`, payload)
+            .then(response => {
+              if (response.data === 'INVALID_PASSWORD') {
+                this.notification.message = 'Invalid password:(';
+                this.notification.type = 'error';
+                return;
+              }
+
+              this.notification.message = 'Movie updated:))';
+              this.notification.type = 'success';
+            })
+            .catch(err => {
+              console.error("Fehler:", err.response?.data || err.message);
+              this.notification.message = "Error";
+              this.notification.type = "error";
+            });
+      });
+    },
   },
   watch: {
     selectedStatus(newStatus) {
@@ -332,7 +364,34 @@ input[type="number"] {
 .notification-box.error {
   color: #ff5252;
 }
-.ratingdb {
-
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
 }
+.modal-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.modal-content input {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.modal-content button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 </style>
