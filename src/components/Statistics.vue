@@ -7,10 +7,15 @@
   </div>
   </div>
 
-  <AverageRatingOverTime />
+  <AverageRatingOverTime/>
 
 </template>
 
 <script setup>
 import AverageRatingOverTime from '@/components/charts/AverageRatingOverTime.vue'
 </script>
+
+<!--TODO genre verteilung pie chart-->
+<!--TODO ratings nach genre-->
+<!--TODO bewertungen pro nutzer (anzahl)-->
+<!--TODO plattformnutzung-->

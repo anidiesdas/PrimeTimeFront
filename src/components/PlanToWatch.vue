@@ -107,7 +107,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .genre-filter button {
@@ -148,7 +148,7 @@ export default {
 
 .plan-grid .poster {
   font-size: 3.5rem;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +164,7 @@ export default {
 }
 
 .plan-grid .movie-card h3 {
-  margin-bottom: 0.4rem;
+  margin: 0 0 0.4rem;
   font-size: 1rem;
   word-break: break-word;
 }

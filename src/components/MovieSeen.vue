@@ -17,6 +17,7 @@
           <option value="DROPPED">Dropped</option>
           <option value="COMPLETED">Completed</option>
         </select>
+
       </div>
 
       <div v-if="notification.message" :class="['notification-box', notification.type]">
@@ -159,7 +160,7 @@ export default {
 
       this.requestPassword(async (password) => {
         if (!password) {
-          this.notification.message = 'Abgebrochen: kein Passwort eingegeben.';
+          this.notification.message = 'Saving canceled';
           this.notification.type = 'error';
           return;
         }
@@ -231,7 +232,8 @@ export default {
   display: flex;
   align-items: center;
 }
-.status-row select {
+.status-row select,
+.status-row .date-picker {
   width: 150px;
   padding: 6px 10px;
   border: 1px solid #ccc;

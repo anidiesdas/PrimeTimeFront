@@ -61,8 +61,10 @@ export default {
     }
 
     const getGenreNames = (ids) => {
+      if (!Array.isArray(ids)) return 'Unknown'
       return ids.map(id => genreMap[id]).filter(Boolean).join(', ')
     }
+
 
     const getPosterUrl = (path) => {
       return path

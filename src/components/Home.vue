@@ -7,6 +7,9 @@
     </div>
   </div>
 
+  <StatusCounts/>
+
+  <hr class="custom-line" />
 
   <div class="hall-container">
     <div class="hall">
@@ -57,8 +60,10 @@
 
 <script>
 import { genreMap } from '@/genre'
+import StatusCounts from "@/components/Charts/StatusCounts.vue";
 
 export default {
+  components: {StatusCounts},
   data() {
     return {
       movies: [],

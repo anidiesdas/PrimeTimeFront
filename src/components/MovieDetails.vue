@@ -21,6 +21,21 @@
         </div>
       </div>
 
+      <button
+          v-if="hasStatus"
+          class="delete-button"
+          @click="requestPassword(confirmDelete)"
+      >
+        🗑️ Delete
+      </button>
+
+      <div v-if="showPasswordModal" class="modal">
+        <div class="modal-content">
+          <input type="password" v-model="enteredPassword" placeholder="Enter password" />
+          <button @click="confirmPassword">OK</button>
+          <button @click="cancelPassword">Cancel</button>
+        </div>
+      </div>
     </div>
 
 
@@ -68,7 +83,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import Rating from './Rating.vue'
 import MovieSeen from './MovieSeen.vue'
@@ -87,6 +101,10 @@ export default {
       ratings: [],
       tags: [],
       routeId: this.$route.params.id,
+      movieStatus: null,
+      showPasswordModal: false,
+      enteredPassword: '',
+      passwordCallback: null,
     }
   },
   computed: {
@@ -102,7 +120,10 @@ export default {
       if (this.ratings.length === 0) return null;
       const total = this.ratings.reduce((sum, entry) => sum + entry.rating, 0);
       return total / this.ratings.length;
-    }
+    },
+    hasStatus() {
+      return this.movieStatus !== null;
+    },
   },
   methods: {
     async fetchMovieDetails() {
@@ -117,6 +138,7 @@ export default {
       const text = await response.text();
       if (!text) {
         this.showRating = true;
+        this.movieStatus = null
         return;
       }
 
@@ -124,13 +146,13 @@ export default {
 
       if (data === null) {
         this.showRating = true;
+        this.movieStatus = null
         return;
       }
 
-      const status = data?.status ?? null;
-
-      this.showRating = status === 'PLAN_TO_WATCH' || status === null;
-      this.alreadyPlanned = status === 'PLAN_TO_WATCH';
+      this.movieStatus = data.status;
+      this.showRating = data.status === 'PLAN_TO_WATCH' || data.status === null;
+      this.alreadyPlanned = data.status === 'PLAN_TO_WATCH';
       this.watchDate = data?.watchDate || null;
     },
     async fetchRatings() {
@@ -157,6 +179,41 @@ export default {
       } catch (err) {
         console.log("Fehler beim Parsen der Tags");
       }
+    },
+    requestPassword(callback) {
+      this.passwordCallback = callback
+      this.showPasswordModal = true
+    },
+    confirmPassword() {
+      this.showPasswordModal = false
+      if (this.passwordCallback) {
+        this.passwordCallback(this.enteredPassword)
+      }
+      this.enteredPassword = ''
+    },
+    cancelPassword() {
+      this.showPasswordModal = false
+      this.enteredPassword = ''
+    },
+    confirmDelete(password) {
+      if (!password) {
+        console.log('Abgebrochen')
+        return
+      }
+
+      fetch(`${import.meta.env.VITE_API_URL}movie/${this.routeId}?password=${password}`, {
+        method: 'DELETE'
+      })
+          .then(res => {
+            if (res.status === 200) {
+              this.$router.push('/') // oder woanders hin
+            } else if (res.status === 403) {
+              alert('Falsches Passwort')
+            } else {
+              alert('Fehler beim Löschen')
+            }
+          })
+          .catch(err => console.error(err))
     }
   },
   mounted() {
@@ -167,7 +224,6 @@ export default {
   }
 }
 </script>
-
 
 
 <style scoped>
@@ -246,7 +302,48 @@ export default {
   font-family: "Special Gothic Expanded One";
   margin: 0 0 0 0;
 }
-</style>
+.delete-button {
+  background-color: #472fe3;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 200;
+  font-size: 0.8rem;
+}
 
-<!--TODO Movie delete-->
-<!--TODO Rating-Funktionen Passwort schützen-->
+.delete-button:hover {
+  background-color: #cc1f1a;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.modal-content input {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+.modal-content button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+</style>

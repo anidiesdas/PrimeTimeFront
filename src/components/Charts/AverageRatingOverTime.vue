@@ -1,8 +1,10 @@
 <template>
   <div>
-    <h2 class="text-xl font-bold mb-2">⌛ Ratings over time...</h2>
+    <h2>⌛ Ratings over time...</h2>
+    <div class="chart-wrapper">
     <Line v-if="chartData.labels.length" :data="chartData" :options="options" />
     <p v-else>Lade Diagrammdaten...</p>
+    </div>
   </div>
 </template>
 
@@ -33,7 +35,7 @@ const chartData = ref({
     label: 'Durchschnittliches Rating',
     data: [],
     borderColor: 'hotpink',// Farbe der Linie
-    backgroundColor: 'pink', // Farbe der Punkte (bzw. Fläche bei Flächendiagramm)
+    backgroundColor: 'pink', // Farbe der Punkte
     pointBackgroundColor: 'white', // Hintergrund der Punkte
     pointBorderColor: 'hotpink', // Randfarbe der Punkte
     borderWidth: 1, // Dicke der Linie
@@ -44,6 +46,7 @@ const chartData = ref({
 })
 
 const options = ref({
+  maintainAspectRatio: false,
   responsive: true,
   plugins: {
     legend: { position: 'top' },
@@ -140,6 +143,12 @@ onMounted(async () => {
     }
   })
 })
-
-
 </script>
+
+<style scoped>
+.chart-wrapper {
+  display: flex;
+  width: 100%;
+  height: 300px;
+}
+</style>

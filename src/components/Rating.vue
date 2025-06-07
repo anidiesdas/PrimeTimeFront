@@ -297,8 +297,6 @@ export default {
 </script>
 
 
-
-
 <style scoped>
 .form-box {
   border: 1px solid rgba(204, 204, 204, 0.23);
