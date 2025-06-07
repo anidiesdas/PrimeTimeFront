@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="all-wrapper">
     <h2>⌛ Ratings over time...</h2>
     <div class="chart-wrapper">
     <Line v-if="chartData.labels.length" :data="chartData" :options="options" />
@@ -103,7 +103,7 @@ onMounted(async () => {
   const res = await fetch(`${import.meta.env.VITE_API_URL}movie/completed`)
   const movies = await res.json()
 
-  const ratingMap = {} // <-- FEHLTE
+  const ratingMap = {}
 
   movies.forEach(movie => {
     if (!movie.watchDate || !movie.ratings?.length) return
@@ -134,7 +134,7 @@ onMounted(async () => {
   chartData.value.labels = sortedDates
   chartData.value.datasets[0].data = sortedDates.map(date => {
     const avg = Number((ratingMap[date].total / ratingMap[date].count).toFixed(2))
-    const entry = ratingMap[date].entries[0] // z.B. erster Film des Datums
+    const entry = ratingMap[date].entries[0]
     return {
       x: date,
       y: avg,
@@ -146,9 +146,19 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.all-wrapper {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  margin: 2rem 0 2rem 0;
+  padding: 1rem 0 1rem 0;
+}
+.all-wrapper h2 {
+  margin: 0.5rem 0.5rem 0.5rem 2rem;
+}
 .chart-wrapper {
   display: flex;
-  width: 100%;
-  height: 300px;
+  width: 95%;
+  height: 350px;
+  margin: 0 auto;
 }
 </style>

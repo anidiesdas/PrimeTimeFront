@@ -4,23 +4,39 @@
       <img src="@/assets/profile.png" alt="Profilbild" class="profile-pic" />
     </router-link>
     <div class="welcome-text">
-      <h1>⏰ Dropped</h1>
+      <h1>🫸 Dropped</h1>
     </div>
   </div>
 
   <div class="movie-list">
 
-    <div class="genre-filter">
-      <button
-          v-for="genre in availableGenres"
-          :key="genre"
-          :class="{ active: selectedGenres.includes(genre) }"
-          @click="toggleGenre(genre)"
-      >
-        {{ getGenreEmoji(genre) }} {{ genre }}
-      </button>
-    </div>
+    <div class="top-bar">
+      <div class="genre-filter">
+        <button
+            v-for="genre in availableGenres"
+            :key="genre"
+            :class="{ active: selectedGenres.includes(genre) }"
+            @click="toggleGenre(genre)"
+        >
+          {{ getGenreEmoji(genre) }} {{ genre }}
+        </button>
+      </div>
 
+      <div class="sort-buttons">
+        <button
+            :class="{ active: sortKey === 'title' }"
+            @click="setSort('title')"
+        >
+          Sort by: A → Z
+        </button>
+        <button
+            :class="{ active: sortKey === 'releaseDate' }"
+            @click="setSort('releaseDate')"
+        >
+          Sort by: 📅 Date
+        </button>
+      </div>
+    </div>
 
     <div class="movie-grid plan-grid">
       <router-link
@@ -46,21 +62,28 @@
 import { getGenreEmoji, genreEmojiMap } from '@/genreEmojis'
 
 export default {
-  name: 'Dropped',
   data() {
     return {
       movies: [],
       selectedGenres: [],
-      availableGenres: Object.keys(genreEmojiMap)
+      availableGenres: Object.keys(genreEmojiMap),
+      sortOrder: 'asc',
+      sortKey: 'title',
     }
   },
   methods: {
     getGenreEmoji,
     toggleGenre(genre) {
-      if (this.selectedGenres.includes(genre)) {
-        this.selectedGenres = this.selectedGenres.filter(g => g !== genre)
+      this.selectedGenres = this.selectedGenres.includes(genre)
+          ? this.selectedGenres.filter(g => g !== genre)
+          : [...this.selectedGenres, genre]
+    },
+    setSort(key) {
+      if (this.sortKey === key) {
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
       } else {
-        this.selectedGenres.push(genre)
+        this.sortKey = key
+        this.sortOrder = 'asc'
       }
     },
     async fetchDroppedMovies() {
@@ -71,7 +94,8 @@ export default {
         this.movies = data.map(movie => ({
           ...movie,
           emoji: this.getEmojiForMovie(movie)
-        }))
+        }));
+
       } catch (err) {
         console.error('Error fetching dropped movies:', err)
       }
@@ -83,11 +107,28 @@ export default {
   },
   computed: {
     filteredMovies() {
-      if (this.selectedGenres.length === 0) return this.movies
+      let result = this.movies
 
-      return this.movies.filter(movie =>
-          this.selectedGenres.every(selected => movie.genres.includes(selected))
-      )
+      if (this.selectedGenres.length > 0) {
+        result = result.filter(movie =>
+            this.selectedGenres.every(g => movie.genres.includes(g))
+        )
+      }
+
+      result = [...result].sort((a, b) => {
+        if (this.sortKey === 'title') {
+          return this.sortOrder === 'asc'
+              ? a.title.localeCompare(b.title)
+              : b.title.localeCompare(a.title)
+        } else if (this.sortKey === 'releaseDate') {
+          const dateA = new Date(a.releaseDate)
+          const dateB = new Date(b.releaseDate)
+          return this.sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+        }
+        return 0
+      })
+
+      return result
     }
   },
   mounted() {

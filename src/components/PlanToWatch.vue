@@ -10,17 +10,33 @@
 
   <div class="movie-list">
 
-    <div class="genre-filter">
-      <button
-          v-for="genre in availableGenres"
-          :key="genre"
-          :class="{ active: selectedGenres.includes(genre) }"
-          @click="toggleGenre(genre)"
-      >
-        {{ getGenreEmoji(genre) }} {{ genre }}
-      </button>
-    </div>
+    <div class="top-bar">
+      <div class="genre-filter">
+        <button
+            v-for="genre in availableGenres"
+            :key="genre"
+            :class="{ active: selectedGenres.includes(genre) }"
+            @click="toggleGenre(genre)"
+        >
+          {{ getGenreEmoji(genre) }} {{ genre }}
+        </button>
+      </div>
 
+      <div class="sort-buttons">
+        <button
+            :class="{ active: sortKey === 'title' }"
+            @click="setSort('title')"
+        >
+          Sort by: A → Z
+        </button>
+        <button
+            :class="{ active: sortKey === 'releaseDate' }"
+            @click="setSort('releaseDate')"
+        >
+          Sort by: 📅 Date
+        </button>
+      </div>
+    </div>
 
     <div class="movie-grid plan-grid">
       <router-link
@@ -46,32 +62,34 @@
 import { getGenreEmoji, genreEmojiMap } from '@/genreEmojis'
 
 export default {
-  name: 'PlanToWatch',
   data() {
     return {
       movies: [],
       selectedGenres: [],
       availableGenres: Object.keys(genreEmojiMap),
+      sortOrder: 'asc',
+      sortKey: 'title',
     }
   },
   methods: {
     getGenreEmoji,
     toggleGenre(genre) {
-      if (this.selectedGenres.includes(genre)) {
-        this.selectedGenres = this.selectedGenres.filter(g => g !== genre)
+      this.selectedGenres = this.selectedGenres.includes(genre)
+          ? this.selectedGenres.filter(g => g !== genre)
+          : [...this.selectedGenres, genre]
+    },
+    setSort(key) {
+      if (this.sortKey === key) {
+        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
       } else {
-        this.selectedGenres.push(genre)
+        this.sortKey = key
+        this.sortOrder = 'asc'
       }
     },
     async fetchPlannedMovies() {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}movie/plantowatch`)
         const data = await res.json()
-
-        const genresSet = new Set()
-        data.forEach(movie => {
-          movie.genres.forEach(genre => genresSet.add(genre))
-        })
 
         this.movies = data.map(movie => ({
           ...movie,
@@ -89,11 +107,28 @@ export default {
   },
   computed: {
     filteredMovies() {
-      if (this.selectedGenres.length === 0) return this.movies;
+      let result = this.movies
 
-      return this.movies.filter(movie =>
-          this.selectedGenres.every(selected => movie.genres.includes(selected))
-      )
+      if (this.selectedGenres.length > 0) {
+        result = result.filter(movie =>
+            this.selectedGenres.every(g => movie.genres.includes(g))
+        )
+      }
+
+      result = [...result].sort((a, b) => {
+        if (this.sortKey === 'title') {
+          return this.sortOrder === 'asc'
+              ? a.title.localeCompare(b.title)
+              : b.title.localeCompare(a.title)
+        } else if (this.sortKey === 'releaseDate') {
+          const dateA = new Date(a.releaseDate)
+          const dateB = new Date(b.releaseDate)
+          return this.sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+        }
+        return 0
+      })
+
+      return result
     }
   },
   mounted() {
@@ -103,6 +138,13 @@ export default {
 </script>
 
 <style>
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
 .genre-filter {
   display: flex;
   flex-wrap: wrap;
@@ -120,11 +162,27 @@ export default {
   transition: background 0.2s;
   color: white;
 }
-
 .genre-filter button.active {
   background: #d884cb;
   color: white;
   border-color: #d884cb;
+}
+.sort-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+.sort-buttons button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: #444;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.sort-buttons button.active {
+  background: #2c3e50;
+  color: white;
 }
 .plan-grid .movie-card {
   display: flex;
@@ -160,7 +218,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 110px
+  min-height: 110px;
 }
 
 .plan-grid .movie-card h3 {
@@ -168,5 +226,4 @@ export default {
   font-size: 1rem;
   word-break: break-word;
 }
-
 </style>

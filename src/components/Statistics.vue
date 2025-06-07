@@ -8,11 +8,14 @@
   </div>
 
   <AverageRatingOverTime/>
+  <GenreDistribution/>
 
 </template>
 
 <script setup>
 import AverageRatingOverTime from '@/components/charts/AverageRatingOverTime.vue'
+import GenreDistribution from '@/components/charts/GenreDistribution.vue'
+
 </script>
 
 <!--TODO genre verteilung pie chart-->
