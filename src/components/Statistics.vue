@@ -9,16 +9,20 @@
 
   <AverageRatingOverTime/>
   <GenreDistribution/>
+  <RatingByGenre/>
+  <PlatformDistribution/>
 
 </template>
 
 <script setup>
-import AverageRatingOverTime from '@/components/charts/AverageRatingOverTime.vue'
-import GenreDistribution from '@/components/charts/GenreDistribution.vue'
+import AverageRatingOverTime from "@/components/charts/AverageRatingOverTime.vue";
+import GenreDistribution from "@/components/charts/GenreDistribution.vue";
+import RatingByGenre from "@/components/Charts/RatingByGenre.vue";
+import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 
 </script>
 
-<!--TODO genre verteilung pie chart-->
-<!--TODO ratings nach genre-->
+<style>
+</style>
 <!--TODO bewertungen pro nutzer (anzahl)-->
 <!--TODO plattformnutzung-->

@@ -41,7 +41,10 @@
         <p class="spacer"></p>
 
 
-        <p><strong>Total minutes: </strong>{{ totalMinutes }}</p>
+        <p><strong>🕒 Total runtime:</strong></p>
+        <p> {{ totalRuntimeFormatted.minutes }} min</p>
+        <p> => {{ totalRuntimeFormatted.hours }} h</p>
+        <p> ==> {{ totalRuntimeFormatted.days }} d</p>
         <p class="spacer"></p>
 
       </div>
@@ -102,6 +105,18 @@ export default {
         console.error('Fehler beim Laden der Durchschnittswerte:', err)
       }
     },
+  },
+  computed: {
+    totalRuntimeFormatted() {
+      const minutes = this.totalMinutes;
+      const hours = (minutes / 60).toFixed(2);
+      const days = (minutes / 1440).toFixed(2);
+      return {
+        minutes,
+        hours,
+        days,
+      };
+    }
   },
   mounted() {
     this.fetchTotalRuntime();

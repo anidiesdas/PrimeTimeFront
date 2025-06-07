@@ -24,8 +24,8 @@ const statusCounts = ref({})
 const total = ref(0)
 
 const statusList = ref([
-  { name: 'DROPPED', count: 0, color: '#134074' },
-  { name: 'PLAN_TO_WATCH', count: 0, color: '#8da9c4' },
+  { name: 'DROPPED', count: 0, color: '#8da9c4' },
+  { name: 'PLAN_TO_WATCH', count: 0, color: '#134074' },
   { name: 'COMPLETED', count: 0, color: '#c7f9cc' },
 ])
 

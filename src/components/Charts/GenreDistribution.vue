@@ -1,6 +1,6 @@
 <template>
   <div class="dough-wrapper">
-    <h2>📊 Genre Distribution</h2>
+    <h2>😽 Genre Distribution</h2>
     <Doughnut v-if="chartData.labels.length" :data="chartData" :options="options" />
     <p v-else>Diagrammdaten werden geladen…</p>
   </div>
@@ -30,7 +30,7 @@ const chartData = ref({
       '#90caf9', '#42a5f5', '#1976d2', '#0d47a1',
       '#082a49', '#10451d', '#155d27', '#25a244',
       '#6ede8a', '#b9d29d', '#fce577', '#fdd730',
-      '#fbc000', "#fc7d71"
+      '#fbc000', '#fc7d71'
     ],
     borderWidth: 0,
   }]
@@ -45,7 +45,7 @@ const options = {
     legend: {
       position: 'left',
       labels: {
-        color: 'white',
+        color: '#a0a0a0',
         font: {
           size: 16,
           family: 'Rubik'
@@ -89,12 +89,10 @@ onMounted(async () => {
 <style scoped>
 .dough-wrapper {
   background-color: rgba(255, 255, 255, 0.07);
-  width: 695px;
+  width: 640px;
   height: 300px;
-  margin: 0 0 0 0;
-  position: relative;
-  padding: 2rem 0 4rem 2rem;
-  border-width: 10px;
+  margin: 2rem auto;
+  padding: 2rem 0 5rem 2rem;
   border-radius: 12px;
 }
 .dough-wrapper h2{
