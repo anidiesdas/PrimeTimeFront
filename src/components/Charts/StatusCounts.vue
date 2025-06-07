@@ -56,7 +56,7 @@ onMounted(fetchData)
 .bar {
   display: flex;
   width: 100%;
-  max-width: 900px;
+  max-width: 960px;
   height: 20px;
   border-radius: 4px;
   overflow: hidden;

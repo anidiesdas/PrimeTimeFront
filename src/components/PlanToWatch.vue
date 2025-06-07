@@ -33,7 +33,7 @@
             :class="{ active: sortKey === 'releaseDate' }"
             @click="setSort('releaseDate')"
         >
-          Sort by: 📅 Date
+          Sort by: 📅 Release Date
         </button>
       </div>
     </div>

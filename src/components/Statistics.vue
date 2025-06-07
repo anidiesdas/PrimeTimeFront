@@ -24,5 +24,5 @@ import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 
 <style>
 </style>
+
 <!--TODO bewertungen pro nutzer (anzahl)-->
-<!--TODO plattformnutzung-->
