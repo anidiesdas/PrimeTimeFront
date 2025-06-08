@@ -331,3 +331,5 @@ th.active {
   font-weight: 500;
 }
 </style>
+
+<!--TODO show platform-->

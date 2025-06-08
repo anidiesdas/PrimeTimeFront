@@ -1,6 +1,6 @@
 <template>
   <div class="dough-wrapper">
-    <h2>🐥 Platform Distribution</h2>
+    <h2>🐀 Platform Distribution</h2>
       <Doughnut v-if="chartData.labels.length" :data="chartData" :options="options" />
       <p v-else>Diagrammdaten werden geladen…</p>
   </div>

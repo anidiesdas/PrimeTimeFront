@@ -65,8 +65,10 @@ const options = ref({
 })
 
 const memberColors = {
-  1: '#a766e6',  2: '#5ca7ff', 3: '#0d15a3', 4: '#f3ff8e', 5: '#80e197',
-  6: '#ff5151',  7: '#4cb111', 8: '#ffffff', 9: '#ff9740', 10: '#000000'
+  1: '#ceb2f4',  2: '#5ca7ff', 3: '#4133c1',
+  4: '#f4f47c',  5: '#abffb8', 6: '#ff5151', 7: '#4cb111',
+  8: '#ffffff',  9: '#ff9740', 10: '#006771', 11: '#7a76d1',
+  12: '#000000'
 }
 
 onMounted(async () => {
@@ -110,13 +112,13 @@ onMounted(async () => {
       const entry = ratingMap[date].entries[0]
       return { x: date, y: avg, title: entry.title, movieId: entry.id }
     }).sort((a, b) => new Date(a.x) - new Date(b.x)),
-    borderColor: 'hotpink',
-    pointBackgroundColor: 'white',
+    backgroundColor: 'hotpink',
+    pointBackgroundColor: 'hotpink',
     pointBorderColor: 'hotpink',
-    borderWidth: 1.5,
+    borderColor: 'hotpink',
+    borderWidth: 0,
     pointRadius: 2,
     pointHoverRadius: 7,
-    tension: 0.5,
     spanGaps: false
   }
 

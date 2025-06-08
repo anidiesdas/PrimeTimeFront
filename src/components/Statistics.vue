@@ -26,3 +26,6 @@ import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 </style>
 
 <!--TODO bewertungen pro nutzer (anzahl)-->
+<!--TODO runtime pro member-->
+<!--TODO line chart average rating-->
+<!--TODO nilli rating coco-->

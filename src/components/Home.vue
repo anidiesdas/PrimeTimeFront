@@ -14,23 +14,23 @@
   <div class="hall-container">
     <div class="hall">
     <h2>Top 3 Genre👀:</h2>
-    <p>1.  {{ topGenres[0]}}</p>
-    <p>2.  {{ topGenres[1]}}</p>
-    <p>3.  {{ topGenres[2]}}</p>
+    <p v-for="(genre, index) in topGenres.slice(0, 5)" :key="'genre' + index">
+      {{ index + 1 }}. {{ genre }}
+    </p>
     </div>
 
     <div class="hall">
-    <h2>Hall of Fame🫦:</h2>
-    <p>1. {{topBestMovies[0]}}</p>
-    <p>2. {{topBestMovies[1]}}</p>
-    <p>3. {{topBestMovies[2]}}</p>
+    <h2>Hall of Fame💅:</h2>
+      <p v-for="(movie, index) in topBestMovies.slice(0, 5)" :key="'best' + index">
+        {{ index + 1 }}. {{ movie }}
+      </p>
     </div>
 
     <div class="hall">
     <h2>Hall of Shame🤢:</h2>
-    <p>1. {{topWorstMovies[0]}}</p>
-    <p>2. {{topWorstMovies[1]}}</p>
-    <p>3. {{topWorstMovies[2]}}</p>
+      <p v-for="(movie, index) in topWorstMovies.slice(0, 5)" :key="'worst' + index">
+        {{ index + 1 }}. {{ movie }}
+      </p>
     </div>
   </div>
 
@@ -128,7 +128,7 @@ export default {
 .hall-container {
   display: flex;
   justify-content: space-around;
-  gap: 6rem;
+  gap: 5rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
 }

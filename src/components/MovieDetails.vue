@@ -206,7 +206,7 @@ export default {
       })
           .then(res => {
             if (res.status === 200) {
-              this.$router.push('/') // oder woanders hin
+              this.$router.push('/')
             } else if (res.status === 403) {
               alert('Falsches Passwort')
             } else {
@@ -347,3 +347,5 @@ export default {
   cursor: pointer;
 }
 </style>
+
+<!--TODO show platform-->

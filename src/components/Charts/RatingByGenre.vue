@@ -1,6 +1,6 @@
 <template>
   <div class="bar-wrapper">
-    <h2>👽 Average Ratings by Genre</h2>
+    <h2>🧀 Average Ratings by Genre</h2>
     <Bar v-if="chartData.labels.length" :data="chartData" :options="options" />
     <p v-else>Daten werden geladen…</p>
   </div>
