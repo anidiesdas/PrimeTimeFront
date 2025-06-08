@@ -8,8 +8,8 @@
     </div>
   </div>
 
-  <main>
-    <div class="top-bar">
+  <div class="movie-list">
+  <div class="top-bar">
       <div class="genre-filter">
         <button
             v-for="genre in availableGenres"
@@ -21,19 +21,37 @@
         </button>
       </div>
 
-      <div class="sort-buttons">
-        <button
+    <div class="sort-buttons">
+      <button
             :class="{ active: sortKey === 'releaseDate' }"
             @click="setSort('releaseDate')"
         >
           Sort by: 📅 Release Date
         </button>
 
-        <div class="toggle-tags">
-          <button @click="toggleTags">
-            🥸 Toggle Tags 🥸
-          </button>
+        <button @click="toggleTags">
+          🥸 Toggle Tags 🥸
+        </button>
+
+        <button
+            :class="{ active: showPlatformFilters }"
+            @click="showPlatformFilters = !showPlatformFilters"
+        >
+          👹 {{ showPlatformFilters ? '' : '' }}
+        </button>
+
+        <div class="platform-filter" v-if="showPlatformFilters">
+          <label v-for="p in platforms" :key="p.label">
+            <input
+                type="checkbox"
+                :value="p.values"
+                :checked="p.values.every(v => selectedPlatformValues.includes(v))"
+                @change="togglePlatformGroup(p.values)"
+            />
+            {{ p.label }}
+          </label>
         </div>
+
       </div>
     </div>
 
@@ -78,7 +96,7 @@
         </tbody>
       </table>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -90,6 +108,16 @@ export default {
     return {
       availableGenres: Object.keys(genreEmojiMap),
       selectedGenres: [],
+      selectedPlatformValues: [],
+      platforms: [
+        { values: ['NETFLIX'], label: 'Netflix' },
+        { values: ['PRIME_VIDEO'], label: 'Prime Video' },
+        { values: ['DISNEY_PLUS'], label: 'Disney+' },
+        { values: ['BLURAY_DVD'], label: 'DVD' },
+        { values: ['UCI_KINO', 'CINESTAR'], label: 'Kino' },
+        { values: ['OTHER', 'YOUTUBE', 'RTL_PLUS', 'PARAMOUNT_PLUS', 'ARTE_MEDIATHEK'], label: 'Other+' },
+      ],
+      showPlatformFilters: false,
       completedMovies: [],
       members: [],
       sortKey: 'title',
@@ -113,7 +141,7 @@ export default {
           const entry = movie.ratings.find(r => r.memberId === member.id);
           const score = entry?.rating ?? null;
 
-          if (member.id >= 7 && member.id <= 10) {
+          if (member.id >= 7 && member.id <= 12) {
             if (score !== null) {
               guestTotal += score;
               guestCount++;
@@ -149,42 +177,37 @@ export default {
         );
       }
 
+      if (this.selectedPlatformValues.length > 0) {
+        result = result.filter(movie =>
+            this.selectedPlatformValues.includes(movie.platform)
+        );
+      }
+
       result = [...result].sort((a, b) => {
         const key = this.sortKey;
-        const parseForSort = val =>
-            val === null || val === undefined || val === '-' ? -1 : parseFloat(val);
+        const parse = v => (v === null || v === undefined || v === '-' ? -1 : parseFloat(v));
 
         if (key === 'title' || key === 'genres' || key === 'tags') {
           const aVal = Array.isArray(a[key]) ? a[key].join(', ') : a[key];
           const bVal = Array.isArray(b[key]) ? b[key].join(', ') : b[key];
-          return this.sortOrder === 'asc'
-              ? aVal.localeCompare(bVal)
-              : bVal.localeCompare(aVal);
+          return this.sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
         }
 
-        if (key === 'releaseDate') {
-          const dateA = new Date(a.releaseDate);
-          const dateB = new Date(b.releaseDate);
-          return this.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        }
-
-        if (key === 'watchDate') {
-          const dateA = new Date(a.watchDate);
-          const dateB = new Date(b.watchDate);
+        if (key === 'releaseDate' || key === 'watchDate') {
+          const dateA = new Date(a[key]);
+          const dateB = new Date(b[key]);
           return this.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         }
 
         if (key === 'meanScore' || key === 'guestAverage') {
-          const aVal = parseForSort(a[key]);
-          const bVal = parseForSort(b[key]);
-          return this.sortOrder === 'asc' ? aVal - bVal : bVal - aVal;
+          return this.sortOrder === 'asc' ? parse(a[key]) - parse(b[key]) : parse(b[key]) - parse(a[key]);
         }
 
         if (key.startsWith('member:')) {
           const name = key.split(':')[1];
-          const scoreA = parseForSort(a.ratings[name]);
-          const scoreB = parseForSort(b.ratings[name]);
-          return this.sortOrder === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+          return this.sortOrder === 'asc'
+              ? parse(a.ratings[name]) - parse(b.ratings[name])
+              : parse(b.ratings[name]) - parse(a.ratings[name]);
         }
 
         return 0;
@@ -200,6 +223,9 @@ export default {
           ? this.selectedGenres.filter(g => g !== genre)
           : [...this.selectedGenres, genre];
     },
+    toggleTags() {
+      this.showTags = !this.showTags;
+    },
     setSort(key) {
       if (this.sortKey === key) {
         this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -214,8 +240,13 @@ export default {
         active: this.sortKey === key
       };
     },
-    toggleTags() {
-      this.showTags = !this.showTags;
+    togglePlatformGroup(values) {
+      const allSelected = values.every(v => this.selectedPlatformValues.includes(v));
+      if (allSelected) {
+        this.selectedPlatformValues = this.selectedPlatformValues.filter(v => !values.includes(v));
+      } else {
+        this.selectedPlatformValues = [...new Set([...this.selectedPlatformValues, ...values])];
+      }
     }
   },
   mounted() {
@@ -230,6 +261,8 @@ export default {
         .then(data => {
           this.completedMovies = data;
         });
+
+    this.selectedPlatformValues = this.platforms.flatMap(p => p.values);
   }
 };
 </script>
@@ -237,19 +270,25 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 
-main {
-  padding: 1rem;
-  max-width: 100%;
-  overflow-x: auto;
-  font-family: 'Rubik', sans-serif;
+.table-container {
+    max-width: 100%;
+    overflow-x: auto;
+    font-family: 'Rubik', sans-serif;
 }
-
 .top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+}
+
+.left-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  min-width: 100%;
 }
 
 .genre-filter {
@@ -275,21 +314,43 @@ main {
   color: white;
   border-color: #d884cb;
 }
-
-.sort-buttons button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  background-color: #0d1b2a;
-  color: white;
-  border: none;
+.platform-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-left: 1.5rem;
+}
+.platform-filter label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ffffff;
+  font-size: 0.85rem;
   cursor: pointer;
 }
-
+.platform-filter input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #ffffff;
+}
+.sort-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  width: 100%;
+}
+.sort-buttons button {
+  height: 30px;
+  background: rgba(82, 119, 156, 0.15);
+  color: white;
+  border: 1px solid #82b1a1;
+}
 .sort-buttons button.active {
-  background: #52779c;
+  height: 30px;
+  background: rgba(130, 177, 161, 0.35);
   color: white;
 }
-
 .table-container {
   max-width: 100%;
   max-height: 700px;
@@ -331,5 +392,3 @@ th.active {
   font-weight: 500;
 }
 </style>
-
-<!--TODO show platform-->

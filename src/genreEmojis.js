@@ -8,14 +8,17 @@ export const genreEmojiMap = {
     Drama: '🎭',
     Family: '👨‍👩‍👧‍👦',
     Fantasy: '🧚‍♀️',
+    History: '📜',
     Horror: '🫣',
     Music: '🎵',
     Mystery: '🕵️',
     Romance: '🫦',
     'Science Fiction': '👽',
     Thriller: '💀',
-}
+    War: '💣',
+    Western: '🤠'
+};
 
 export function getGenreEmoji(genre) {
-    return genreEmojiMap[genre] || '🎬'; // Fallback
+    return genreEmojiMap[genre] || '🎬';
 }

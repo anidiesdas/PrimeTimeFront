@@ -9,7 +9,6 @@
 
   <AverageRatingOverTime/>
   <GenreDistribution/>
-  <RatingByGenre/>
   <PlatformDistribution/>
 
 </template>
@@ -17,7 +16,6 @@
 <script setup>
 import AverageRatingOverTime from "@/components/charts/AverageRatingOverTime.vue";
 import GenreDistribution from "@/components/charts/GenreDistribution.vue";
-import RatingByGenre from "@/components/Charts/RatingByGenre.vue";
 import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 
 </script>
@@ -28,4 +26,4 @@ import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 <!--TODO bewertungen pro nutzer (anzahl)-->
 <!--TODO runtime pro member-->
 <!--TODO line chart average rating-->
-<!--TODO nilli rating coco-->
+<!--TODO monthly recap-->

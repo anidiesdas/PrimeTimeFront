@@ -29,6 +29,8 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, LinearScale,
 
 const router = useRouter()
 const chartData = ref({ labels: [], datasets: [] })
+const memberMap = {}
+
 const options = ref({
   maintainAspectRatio: false,
   responsive: true,
@@ -38,11 +40,18 @@ const options = ref({
       callbacks: {
         title(context) {
           const date = new Date(context[0].parsed.x)
-          return date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' })
+          return date.toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
         },
         label(context) {
           const point = context.raw
-          return [`🎬 ${point.title}`, `⭐ Rating: ${point.y}`]
+          return [
+            `🎬 ${point.title}`,
+            `🍿 Ø ${point.y}`,
+          ]
         }
       }
     }
@@ -65,10 +74,9 @@ const options = ref({
 })
 
 const memberColors = {
-  1: '#ceb2f4',  2: '#5ca7ff', 3: '#4133c1',
-  4: '#f4f47c',  5: '#abffb8', 6: '#ff5151', 7: '#4cb111',
-  8: '#ffffff',  9: '#ff9740', 10: '#006771', 11: '#7a76d1',
-  12: '#000000'
+  1: '#ceb2f4',  2: '#8ad2ff', 3: '#6554ff',  4: '#f4f47c',
+  5: '#abffb8', 6: '#ff5151', 7: '#4cb111', 8: '#989898',
+  9: '#ff9740', 10: '#ffffff', 11: '#7a76d1', 12: '#000000'
 }
 
 onMounted(async () => {
@@ -78,40 +86,40 @@ onMounted(async () => {
   ])
   const [movies, members] = await Promise.all([moviesRes.json(), membersRes.json()])
 
-  const ratingMap = {}
+  members.forEach(m => {
+    memberMap[m.id] = m.name
+  })
+
+  const avgPoints = []
 
   movies.forEach(movie => {
     if (!movie.watchDate || !movie.ratings?.length) return
-    const date = movie.watchDate
-    const title = movie.title
-    const ratings = movie.ratings.map(r => r.rating).filter(r => typeof r === 'number' && r > 0)
-    if (!ratings.length) return
-    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length
 
-    if (!ratingMap[date]) {
-      ratingMap[date] = {
-        total: avg,
-        count: 1,
-        entries: [{ id: movie.id, title }]
-      }
-    } else {
-      ratingMap[date].total += avg
-      ratingMap[date].count++
-      ratingMap[date].entries.push({ id: movie.id, title })
-    }
+    const ratings = movie.ratings
+        .map(r => parseFloat(r.rating))
+        .filter(r => !isNaN(r) && r > 0)
+
+    if (!ratings.length) return
+
+    const avg = Number((ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2))
+
+    avgPoints.push({
+      x: movie.watchDate,
+      y: avg,
+      title: movie.title,
+      movieId: movie.id,
+      ratings: movie.ratings.map(r => ({
+        memberId: r.memberId,
+        rating: typeof r.rating === 'number' ? r.rating : parseFloat(r.rating)
+      }))
+    })
   })
 
-  const sortedDates = Object.keys(ratingMap).sort((a, b) => new Date(a) - new Date(b))
-
-  chartData.value.labels = sortedDates
+  chartData.value.labels = avgPoints.map(p => p.x)
 
   const avgDataset = {
     label: 'Durchschnitt',
-    data: sortedDates.map(date => {
-      const avg = Number((ratingMap[date].total / ratingMap[date].count).toFixed(2))
-      const entry = ratingMap[date].entries[0]
-      return { x: date, y: avg, title: entry.title, movieId: entry.id }
-    }).sort((a, b) => new Date(a.x) - new Date(b.x)),
+    data: avgPoints.sort((a, b) => new Date(a.x) - new Date(b.x)),
     backgroundColor: 'hotpink',
     pointBackgroundColor: 'hotpink',
     pointBorderColor: 'hotpink',
