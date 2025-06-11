@@ -3,7 +3,7 @@
     <h2>🧀 Ratings over time...</h2>
     <div class="chart-wrapper">
       <Line v-if="chartData.labels.length" :data="chartData" :options="options" />
-      <p v-else>Lade Diagrammdaten...</p>
+      <p v-else>Diagrammdaten werden geladen...</p>
     </div>
   </div>
 </template>
@@ -37,6 +37,7 @@ const options = ref({
   plugins: {
     legend: { position: 'top' },
     tooltip: {
+      backgroundColor: 'rgba(0,0,0,0.63)',
       callbacks: {
         title(context) {
           const date = new Date(context[0].parsed.x)

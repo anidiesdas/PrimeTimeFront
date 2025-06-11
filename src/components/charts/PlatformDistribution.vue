@@ -2,7 +2,7 @@
   <div class="dough-wrapper">
     <h2>🐀 Platform Distribution</h2>
       <Doughnut v-if="chartData.labels.length" :data="chartData" :options="options" />
-      <p v-else>Diagrammdaten werden geladen…</p>
+      <p v-else>Diagrammdaten werden geladen...</p>
   </div>
 </template>
 
@@ -64,7 +64,7 @@ const options = {
       }
     },
     tooltip: {
-      backgroundColor: '#2e2e2e',
+      backgroundColor: 'rgba(0,0,0,0.63)',
       titleColor: 'white',
       bodyColor: '#f8f8f8',
       callbacks: {

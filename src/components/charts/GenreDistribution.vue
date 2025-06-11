@@ -1,8 +1,8 @@
 <template>
-  <div class="pyramid-wrapper">
+  <div class="chart-wrapper">
     <h2>😽 Genre Distribution</h2>
     <Bar v-if="chartData.labels.length" :data="chartData" :options="options" />
-    <p v-else>Diagrammdaten werden geladen…</p>
+    <p v-else>Diagrammdaten werden geladen...</p>
   </div>
 </template>
 
@@ -85,7 +85,7 @@ const options = {
       display: false
     },
     tooltip: {
-      backgroundColor: '#2e2e2e',
+      backgroundColor: 'rgba(0,0,0,0.63)',
       titleColor: 'white',
       bodyColor: '#f8f8f8',
       callbacks: {
@@ -151,7 +151,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.pyramid-wrapper {
+.chart-wrapper {
   background-color: rgba(255, 255, 255, 0.07);
   width: 100%;
   height: 460px;
@@ -160,7 +160,7 @@ onMounted(async () => {
   border-radius: 12px;
 }
 
-.pyramid-wrapper h2 {
+.chart-wrapper h2 {
   margin: 0 0 1rem 1rem;
 }
 </style>

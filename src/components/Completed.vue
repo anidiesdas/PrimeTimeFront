@@ -283,14 +283,6 @@ export default {
   margin-bottom: 1.5rem;
 }
 
-.left-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  flex: 1;
-  min-width: 100%;
-}
-
 .genre-filter {
   display: flex;
   flex-wrap: wrap;

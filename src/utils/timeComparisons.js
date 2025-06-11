@@ -8,7 +8,7 @@ export const timeComparisons = [
         minutesPerUnit: 560,
     },
     {
-        text: "you could’ve carried {count} <strong>VALORANT</strong> matches >:)💪 <br>...or ended up as botfrag✊😞.",
+        text: "you could’ve carried {count} <strong>VALORANT</strong> matches >:)💪. <br>...or ended up as botfrag✊😞.",
         minutesPerUnit: 40,
     },
     {
@@ -24,7 +24,7 @@ export const timeComparisons = [
         minutesPerUnit: 195,
     },
     {
-        text: "you could’ve finished {count} full-length <strong>university<br>lectures</strong>🤓.",
+        text: "you could’ve attended {count} full-length <strong>university<br>lectures</strong>🤓.",
         minutesPerUnit: 90,
     },
     {

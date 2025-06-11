@@ -12,6 +12,7 @@
   <AverageRatingOverTime/>
   <GenreDistribution/>
   <PlatformDistribution/>
+  <MemberMovieCount/>
 
 </template>
 
@@ -20,11 +21,8 @@ import HallOfStats from "@/components/under/HallOfStats.vue"
 import AverageRatingOverTime from "@/components/charts/AverageRatingOverTime.vue";
 import GenreDistribution from "@/components/charts/GenreDistribution.vue";
 import PlatformDistribution from "@/components/charts/PlatformDistribution.vue";
+import MemberMovieCount from "@/components/charts/MemberMovieCount.vue";
 </script>
 
 <style>
 </style>
-
-<!--TODO bewertungen pro nutzer (anzahl)-->
-<!--TODO runtime pro member-->
-<!--TODO monthly recap-->
