@@ -61,8 +61,7 @@
         <tr>
           <th>Nr.</th>
           <th @click="setSort('title')" :class="getSortClass('title')">Titel</th>
-          <th @click="setSort('watchDate')" :class="getSortClass('watchDate')">Watch Date</th>
-          <th @click="setSort('genres')" :class="getSortClass('genres')">Genre</th>
+          <th @click="setSort('meanScore')" :class="getSortClass('meanScore')">👯‍♀️</th>
           <th
               v-for="member in visibleMembers"
               :key="member.id"
@@ -72,7 +71,8 @@
             {{ member.name }}
           </th>
           <th @click="setSort('guestAverage')" :class="getSortClass('guestAverage')">guest</th>
-          <th @click="setSort('meanScore')" :class="getSortClass('meanScore')">Ø</th>
+          <th @click="setSort('genres')" :class="getSortClass('genres')">Genre</th>
+          <th @click="setSort('watchDate')" :class="getSortClass('watchDate')">Watch Date</th>
           <th v-if="showTags" @click="setSort('tags')" :class="getSortClass('tags')">Tags</th>
         </tr>
         </thead>
@@ -84,13 +84,13 @@
               {{ movie.title }}
             </router-link>
           </td>
-          <td>{{ movie.watchDate }}</td>
-          <td>{{ movie.genres.join(', ') }}</td>
+          <td>{{ movie.meanScore }}</td>
           <td v-for="member in visibleMembers" :key="member.id">
             {{ movie.ratings[member.name] ?? '-' }}
           </td>
           <td>{{ movie.guestAverage ?? '-' }}</td>
-          <td>{{ movie.meanScore }}</td>
+          <td>{{ movie.genres.join(', ') }}</td>
+          <td>{{ movie.watchDate }}</td>
           <td v-if="showTags">{{ movie.tags?.join(', ') || '-' }}</td>
         </tr>
         </tbody>
@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { getGenreEmoji, genreEmojiMap } from '@/genreEmojis'
+import { getGenreEmoji, genreEmojiMap } from '@/utils/genreEmojis.js'
 
 export default {
   name: 'CompletedTable',

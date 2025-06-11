@@ -1,6 +1,6 @@
 <template>
   <div class="all-wrapper">
-    <h2>📈 Ratings over time...</h2>
+    <h2>🧀 Ratings over time...</h2>
     <div class="chart-wrapper">
       <Line v-if="chartData.labels.length" :data="chartData" :options="options" />
       <p v-else>Lade Diagrammdaten...</p>
@@ -74,24 +74,26 @@ const options = ref({
 })
 
 const memberColors = {
-  1: '#ceb2f4',  2: '#8ad2ff', 3: '#6554ff',  4: '#f4f47c',
+  1: '#a685d3',  2: '#a9dfff', 3: '#0a3a78',  4: '#f4f47c',
   5: '#abffb8', 6: '#ff5151', 7: '#4cb111', 8: '#989898',
-  9: '#ff9740', 10: '#ffffff', 11: '#7a76d1', 12: '#000000'
+  9: '#ff9740', 10: '#ffffff', 11: '#fff202', 12: '#000000'
 }
 
 onMounted(async () => {
-  const [moviesRes, membersRes] = await Promise.all([
+  const [moviesRes, membersRes, globalProgressRes] = await Promise.all([
     fetch(`${import.meta.env.VITE_API_URL}movie/completed`),
-    fetch(`${import.meta.env.VITE_API_URL}members`)
+    fetch(`${import.meta.env.VITE_API_URL}members`),
+    fetch(`${import.meta.env.VITE_API_URL}ratings/global-progress`)
   ])
-  const [movies, members] = await Promise.all([moviesRes.json(), membersRes.json()])
+  const [movies, members, globalProgress] = await Promise.all([
+    moviesRes.json(), membersRes.json(), globalProgressRes.json()
+  ])
 
   members.forEach(m => {
     memberMap[m.id] = m.name
   })
 
   const avgPoints = []
-
   movies.forEach(movie => {
     if (!movie.watchDate || !movie.ratings?.length) return
 
@@ -117,8 +119,26 @@ onMounted(async () => {
 
   chartData.value.labels = avgPoints.map(p => p.x)
 
+  const cumulativeDataset = {
+    label: 'Avg',
+    data: globalProgress.map(p => ({
+      x: p.date,
+      y: p.cumulativeAverage,
+      title: `Daily: ${p.averageOfDay.toFixed(2)}`
+    })),
+    backgroundColor: '#56B4E9',
+    pointBackgroundColor: 'white',
+    pointBorderColor: '#56B4E9',
+    borderColor: '#56B4E9',
+    borderWidth: 1.5,
+    pointRadius: 0.2,
+    pointHoverRadius: 4,
+    tension: 0.5,
+    spanGaps: false
+  }
+
   const avgDataset = {
-    label: 'Durchschnitt',
+    label: 'Daily Avg',
     data: avgPoints.sort((a, b) => new Date(a.x) - new Date(b.x)),
     backgroundColor: 'hotpink',
     pointBackgroundColor: 'hotpink',
@@ -157,7 +177,7 @@ onMounted(async () => {
     }
   })
 
-  chartData.value.datasets = [avgDataset, ...memberDatasets]
+  chartData.value.datasets = [cumulativeDataset, avgDataset, ...memberDatasets]
 })
 </script>
 

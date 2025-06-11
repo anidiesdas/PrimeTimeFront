@@ -19,10 +19,8 @@ import {
   LinearScale
 } from 'chart.js'
 
-// Chart.js Komponenten registrieren
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-// Chart-Daten & Bewertungsschnitt
 const chartData = ref({
   labels: [],
   datasets: [{
@@ -41,7 +39,7 @@ const chartData = ref({
   }]
 })
 
-const genreAverages = ref({}) // Durchschnittsbewertungen pro Genre
+const genreAverages = ref({})
 
 const options = {
   indexAxis: 'y',

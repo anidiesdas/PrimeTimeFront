@@ -9,7 +9,7 @@
 
   <div class="movie-layout">
     <div class="left-column">
-      <img :src="posterUrl" class="poster" />
+      <img :src="posterUrl" class="poster"/>
 
       <p v-if="averageMovieRating !== null">
         {{ averageMovieRating.toFixed(2) }}⭐
@@ -79,13 +79,14 @@
           :movie-id="movie.id"
       />
 
-      <p v-if="alreadyPlanned" style="color: #4488ca;">P.S. Dieser Film ist bereits in der Watchlist.</p>
+      <p v-if='alreadyPlanned' style="color: #4488ca;">P.S. Dieser Film ist bereits in der Watchlist.</p>
+      <p v-if='!showRating' style='color: #4488ca;'> You watched this movie on {{ moviePlatform }} 👍</p>
     </div>
   </div>
 </template>
 <script>
-import Rating from './Rating.vue'
-import MovieSeen from './MovieSeen.vue'
+import Rating from './under/Rating.vue'
+import MovieSeen from './under/MovieSeen.vue'
 
 export default {
   components: {
@@ -97,6 +98,7 @@ export default {
       movie: {},
       showRating: false,
       watchDate: null,
+      moviePlatform: [],
       alreadyPlanned: false,
       ratings: [],
       tags: [],
@@ -154,6 +156,7 @@ export default {
       this.showRating = data.status === 'PLAN_TO_WATCH' || data.status === null;
       this.alreadyPlanned = data.status === 'PLAN_TO_WATCH';
       this.watchDate = data?.watchDate || null;
+      this.moviePlatform = data.platform || [];
     },
     async fetchRatings() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}ratings/movie/${this.routeId}`)
@@ -257,7 +260,7 @@ export default {
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  margin: 0rem 0 1rem 0;
+  margin: 0 0 1rem 0;
   max-width: 100%;
   max-height: 100%;
 }
@@ -347,5 +350,3 @@ export default {
   cursor: pointer;
 }
 </style>
-
-<!--TODO show platform-->

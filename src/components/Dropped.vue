@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getGenreEmoji, genreEmojiMap } from '@/genreEmojis'
+import { getGenreEmoji, genreEmojiMap } from '@/utils/genreEmojis.js'
 
 export default {
   data() {

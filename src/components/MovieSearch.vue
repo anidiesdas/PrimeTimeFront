@@ -36,7 +36,7 @@
 <script>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { genreMap } from '@/genre'
+import { genreMap } from '@/utils/genre.js'
 
 export default {
   setup() {

@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { getGenreEmoji, genreEmojiMap } from '@/genreEmojis'
+import { getGenreEmoji, genreEmojiMap } from '@/utils/genreEmojis.js'
 
 export default {
   data() {
@@ -174,14 +174,13 @@ export default {
 .sort-buttons button {
   padding: 6px 12px;
   border-radius: 6px;
-  background-color: #444;
+  background: rgba(82, 119, 156, 0.15);
   color: white;
-  border: none;
+  border: 1px solid #82b1a1;
   cursor: pointer;
 }
-
 .sort-buttons button.active {
-  background: #2c3e50;
+  background: rgba(130, 177, 161, 0.35);
   color: white;
 }
 .plan-grid .movie-card {

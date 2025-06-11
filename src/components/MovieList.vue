@@ -30,7 +30,7 @@
 
 
 <script>
-import { genreMap } from '@/genre'
+import { genreMap } from '@/utils/genre.js'
 
 export default {
   name: 'YourComponentName',

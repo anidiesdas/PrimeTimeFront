@@ -7,6 +7,8 @@
   </div>
   </div>
 
+  <HallOfStats />
+  <hr class="custom-line" />
   <AverageRatingOverTime/>
   <GenreDistribution/>
   <PlatformDistribution/>
@@ -14,10 +16,10 @@
 </template>
 
 <script setup>
+import HallOfStats from "@/components/under/HallOfStats.vue"
 import AverageRatingOverTime from "@/components/charts/AverageRatingOverTime.vue";
 import GenreDistribution from "@/components/charts/GenreDistribution.vue";
-import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
-
+import PlatformDistribution from "@/components/charts/PlatformDistribution.vue";
 </script>
 
 <style>
@@ -25,5 +27,4 @@ import PlatformDistribution from "@/components/Charts/PlatformDistribution.vue";
 
 <!--TODO bewertungen pro nutzer (anzahl)-->
 <!--TODO runtime pro member-->
-<!--TODO line chart average rating-->
 <!--TODO monthly recap-->

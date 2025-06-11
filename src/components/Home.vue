@@ -1,4 +1,4 @@
-<template>
+<template xmlns="http://www.w3.org/1999/html">
   <div class="welcome-wrapper">
     <router-link to="/">
       <img src="@/assets/profile.png" alt="Profilbild" class="profile-pic" />
@@ -11,33 +11,31 @@
 
   <hr class="custom-line" />
 
-  <div class="hall-container">
-    <div class="hall">
-    <h2>Top 3 Genre👀:</h2>
-    <p v-for="(genre, index) in topGenres.slice(0, 5)" :key="'genre' + index">
-      {{ index + 1 }}. {{ genre }}
-    </p>
+  <div class="hall-container" v-if="monthlyRecap">
+
+    <div class="hall" style="width: 800px">
+      <h2>🍿YOUR MONTHLY RECAP</h2>
+      <div style="margin-left: 2.4rem">
+      <p>You watched <strong>{{ monthlyRecap.totalMoviesWatched }}</strong> movies together in {{ monthlyRecap.monthName }}!!</p>
+      <p class="spacer" style="margin: 0.5rem"></p>
+      <p v-if="comparisonText" v-html="comparisonText"></p>
+      <p class="spacer"></p>
+      <p>💯{{ monthlyRecap.bestRatedMovie }} >>>>👎{{ monthlyRecap.worstRatedMovie }}</p>
+      <p class="spacer"></p>
+      <p><strong>Top Genres:</strong> {{ monthlyRecap.topGenres.join(', ') }}</p>
+      </div>
     </div>
 
     <div class="hall">
-    <h2>Hall of Fame💅:</h2>
-      <p v-for="(movie, index) in topBestMovies.slice(0, 5)" :key="'best' + index">
-        {{ index + 1 }}. {{ movie }}
-      </p>
+      <p style="font-size: 180px; margin: 2rem 0 -3rem -4rem; ">❤️‍🔥</p>
     </div>
 
-    <div class="hall">
-    <h2>Hall of Shame🤢:</h2>
-      <p v-for="(movie, index) in topWorstMovies.slice(0, 5)" :key="'worst' + index">
-        {{ index + 1 }}. {{ movie }}
-      </p>
-    </div>
   </div>
 
   <hr class="custom-line" />
 
   <div class="movie-list">
-    <h2>🎬⭐Trending Movies</h2>
+    <h2>🎬⭐TRENDING MOVIES</h2>
     <div class="movie-grid">
       <router-link
           v-for="movie in movies"
@@ -59,14 +57,17 @@
 </template>
 
 <script>
-import { genreMap } from '@/genre'
-import StatusCounts from "@/components/Charts/StatusCounts.vue";
+import { genreMap } from '@/utils/genre.js'
+import StatusCounts from "@/components/charts/StatusCounts.vue";
+import { getRandomComparison } from "@/utils/timeComparisons.js"
 
 export default {
   components: {StatusCounts},
   data() {
     return {
       movies: [],
+      monthlyRecap: null,
+      comparisonText: '',
       topGenres: [],
       topBestMovies: [],
       topWorstMovies: [],
@@ -81,12 +82,13 @@ export default {
     getPosterUrl(path) {
       return path ? `https://image.tmdb.org/t/p/w500${path}` : ''
     },
-    async fetchTopGenres() {
+    async fetchMonthlyRecap() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}movie/top-genres`);
-        this.topGenres = await res.json();
+        const res = await fetch(`${import.meta.env.VITE_API_URL}movie/monthly-recap`)
+        this.monthlyRecap = await res.json()
+        this.comparisonText = getRandomComparison(this.monthlyRecap.totalRuntime);
       } catch (err) {
-        console.error("Fehler beim Laden der Top-Genres:", err);
+        console.error('Fehler beim Laden des Monatsrückblicks:', err)
       }
     },
     async fetchPopularMovies() {
@@ -98,28 +100,10 @@ export default {
         console.error('Fehler beim Laden der populären Filme:', err)
       }
     },
-    async fetchBestMovies() {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/top-rated`)
-        this.topBestMovies = await res.json()
-      } catch (err) {
-        console.error('Fehler beim Laden der bestbewerteten Filme:', err)
-      }
-    },
-    async fetchWorstMovies() {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}ratings/worst-rated`)
-        this.topWorstMovies = await res.json()
-      } catch (err) {
-        console.error('Fehler beim Laden der schlechtbewerteten Filme:', err)
-      }
-    }
   },
   mounted() {
     this.fetchPopularMovies()
-    this.fetchTopGenres()
-    this.fetchBestMovies()
-    this.fetchWorstMovies()
+    this.fetchMonthlyRecap()
   }
 }
 </script>
@@ -127,8 +111,7 @@ export default {
 <style>
 .hall-container {
   display: flex;
-  justify-content: space-around;
-  gap: 5rem;
+  justify-content: normal;
   flex-wrap: wrap;
   margin-bottom: 2rem;
 }
@@ -137,7 +120,9 @@ export default {
 }
 .hall p{
   font-size: 20px;
-  margin-bottom: 2px;
+  margin: 0 0 2px 0;
 }
-
+.hall .spacer {
+  margin: 1.5rem;
+}
 </style>
