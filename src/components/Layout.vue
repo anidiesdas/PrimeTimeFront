@@ -4,8 +4,8 @@
       <div class="nav-links">
         <router-link to="/popular">Trending</router-link>
         <router-link to="/plantowatch">Plan To Watch</router-link>
-        <router-link to="/completed">Completed</router-link>
         <router-link to="/dropped">Dropped</router-link>
+        <router-link to="/completed">Completed</router-link>
         <router-link to="/statistics">Statistics</router-link>
       </div>
     </nav>
@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Statistics from "@/components/Statistics.vue";
 
 export default {
@@ -83,8 +82,8 @@ export default {
     },
     async fetchStatusCounts() {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}movie/status-counts`);
-        this.statusCounts = res.data;
+        const res = await fetch(`${import.meta.env.VITE_API_URL}movie/status-counts`);
+        this.statusCounts = await res.json();
       } catch (err) {
         console.error("Fehler beim Laden der Status-Zahlen:", err);
       }

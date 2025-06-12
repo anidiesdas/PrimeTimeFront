@@ -111,7 +111,6 @@ onMounted(async () => {
       const genres = movie.genres || []
       const ratings = movie.ratings || []
 
-      // Durchschnitt aller Bewertungen dieses Films berechnen
       const validRatings = ratings
           .map(r => r.rating)
           .filter(r => typeof r === 'number' && r > 0)

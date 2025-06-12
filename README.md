@@ -1,5 +1,36 @@
-# Vue 3 + Vite
+### 🖼️ Frontend (Vue 3 + Chart.js + Vite)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+#### 🤖 System requirements
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+- **Node.js** (empfohlen: ≥ 18.x, LTS-Version empfohlen)
+- **npm** (wird automatisch mit Node.js installiert)
+
+#### 🎁 Enthaltene Pakete
+
+| Paket                        | Beschreibung                          |
+|-----------------------------|---------------------------------------|
+| `vue`                       | Vue 3 Framework                       |
+| `vue-router`                | Routing            |
+| `axios`                     | HTTP-Client für API-Requests          |
+| `chart.js`                  | Diagramm-Rendering-Engine             |
+| `vue-chartjs`               | Vue-Wrapper für Chart.js              |
+| `chartjs-adapter-date-fns` | für Zeitachsen in Chart.js     |
+| `recharts`                  | Weitere Diagramme                     |
+| `@vitejs/plugin-vue`        | Plugin zur Integration von Vue in Vite |
+| `vite`                      | Build- & Dev-Tool                     |
+| `vitest`, `jsdom`, `@vue/test-utils` | Tools für Tests                       |
+
+#### 👹 Frontend Setup
+
+```bash
+# 1. Node.js installieren (über https://nodejs.org)
+# 2. Ins Frontend-Verzeichnis wechseln
+
+# 3. Abhängigkeiten installieren
+npm install
+
+# 4. In .env Backend als Datenquelle angeben (Standard-Port: 8080)
+
+# 5. Dev-Server starten
+npm run dev
+```

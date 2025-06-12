@@ -13,7 +13,7 @@ export const timeComparisons = [
     },
     {
         text: "you could’ve played {count} whole <strong>League</strong> matches... <br> (without getting tilt ofc😇 hehe)",
-        minutesPerUnit: 50,
+        minutesPerUnit: 35,
     },
     {
         text: "you could’ve scrolled <strong>TikTok</strong> for {count} hours straight<br>instead🧟.",
